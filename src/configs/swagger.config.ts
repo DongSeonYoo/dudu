@@ -3,9 +3,9 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 export const setSwagger = (app: INestApplication) => {
   const config = new DocumentBuilder()
-    .setTitle('nest-template')
+    .setTitle('dudu')
     .setDescription('')
-    .setVersion('1.0.0')
+    .setVersion('0.0.1')
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

@@ -6,3 +6,106 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model AcademySchedule {
+  idx         Int      @id @default(autoincrement())
+  studentIdx  Int      @map("student_idx")
+  academyName String   @map("academy_name") @db.VarChar
+  daysOfWeek  Int      @map("days_of_week") @db.SmallInt
+  startedTime DateTime @map("started_time") @db.Time(6)
+  endedTime   DateTime @map("ended_time") @db.Time(6)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  Student     Student  @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student_to_academy_schedule")
+
+  @@map("academy_schedule")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Attendance {
+  idx        Int       @id @default(autoincrement())
+  studentIdx Int       @map("student_idx")
+  checkInAt  DateTime? @map("check_in_at") @db.Time(6)
+  checkOutAt DateTime? @map("check_out_at") @db.Time(6)
+  isOuting   Boolean   @default(false) @map("is_outing")
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  Student    Student   @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student_to_attendance")
+  Outing     Outing[]
+
+  @@map("attendance")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Enrollment {
+  idx        Int       @id @default(autoincrement())
+  studentIdx Int       @map("student_idx")
+  startedAt  DateTime  @map("started_at") @db.Timestamptz(6)
+  endedAt    DateTime  @map("ended_at") @db.Timestamptz(6)
+  amount     Int
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt  DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamptz(6)
+  Student    Student   @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student_to_enrollment")
+
+  @@map("enrollment")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Outing {
+  studentIdx    Int        @map("student_idx")
+  attendanceIdx Int        @map("attendance_idx")
+  startTime     DateTime   @map("start_time") @db.Time(6)
+  endTime       DateTime   @map("end_time") @db.Time(6)
+  reason        String
+  createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
+  Attendance    Attendance @relation(fields: [attendanceIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_attendance_to_outing")
+  Student       Student    @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student_to_outing")
+
+  @@id([studentIdx, attendanceIdx])
+  @@map("outing")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Parent {
+  idx         Int      @id @default(autoincrement())
+  studentIdx  Int      @map("student_idx")
+  name        String   @db.VarChar
+  phoneNumber String   @map("phone_number") @db.Char(11)
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  Student     Student  @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student_to_parent")
+
+  @@map("parent")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Student {
+  idx             Int               @id @default(autoincrement())
+  type            TYPE
+  gender          String            @db.VarChar
+  school          String            @default("무소속") @db.VarChar
+  name            String            @db.VarChar
+  phoneNumber     String            @map("phone_number") @db.Char(11)
+  email           String?           @db.VarChar
+  studentNumber   String            @map("student_number") @db.Char(4)
+  birthDate       DateTime          @map("birth_date") @db.Timestamptz(6)
+  createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6)
+  deletedAt       DateTime?         @map("deleted_at") @db.Timestamptz(6)
+  AcademySchedule AcademySchedule[]
+  Attendance      Attendance[]
+  Enrollment      Enrollment[]
+  Outing          Outing[]
+  Parent          Parent[]
+
+  @@unique([studentNumber, deletedAt], map: "unique_student_number_deleted_at")
+  @@map("student")
+}
+
+enum TYPE {
+  STUDENT // 학생
+  REAPEATER // 재수생
+}

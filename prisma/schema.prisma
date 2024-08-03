@@ -84,17 +84,17 @@ model Parent {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Student {
   idx             Int               @id @default(autoincrement())
-  type            TYPE
   gender          String            @db.VarChar
   school          String            @default("무소속") @db.VarChar
   name            String            @db.VarChar
   phoneNumber     String            @map("phone_number") @db.Char(11)
   email           String?           @db.VarChar
-  studentNumber   String            @map("student_number") @db.Char(4)
-  birthDate       DateTime          @map("birth_date") @db.Timestamptz(6)
+  birthDate       DateTime          @map("birth_date") @db.Date
   createdAt       DateTime          @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt       DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6)
   deletedAt       DateTime?         @map("deleted_at") @db.Timestamptz(6)
+  type            TYPE
+  studentNumber   Int               @map("student_number") @db.SmallInt
   AcademySchedule AcademySchedule[]
   Attendance      Attendance[]
   Enrollment      Enrollment[]
@@ -106,6 +106,6 @@ model Student {
 }
 
 enum TYPE {
-  STUDENT // 학생
-  REAPEATER // 재수생
+  STUDENT
+  REAPEATER
 }

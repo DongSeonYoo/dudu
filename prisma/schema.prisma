@@ -94,7 +94,7 @@ model Student {
   updatedAt       DateTime          @default(now()) @map("updated_at") @db.Timestamptz(6)
   deletedAt       DateTime?         @map("deleted_at") @db.Timestamptz(6)
   type            TYPE
-  studentNumber   Int               @map("student_number") @db.SmallInt
+  studentNumber   String            @map("student_number") @db.Char(4)
   AcademySchedule AcademySchedule[]
   Attendance      Attendance[]
   Enrollment      Enrollment[]

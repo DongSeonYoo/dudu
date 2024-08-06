@@ -23,7 +23,13 @@ export class UnhandledExceptionFilter implements ExceptionFilter {
       timestamp: new Date(),
     };
 
-    this.logger.error(exception);
+    if (process.env.NODE_ENV !== 'development') {
+      this.logger.error(
+        exception.message,
+        exception.stack,
+        'UnhandledExceptionFilter',
+      );
+    }
 
     return res.status(statusCode).send(response);
   }

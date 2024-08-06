@@ -27,10 +27,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       : HttpStatus.INTERNAL_SERVER_ERROR;
 
     const response: IExceptionResponse = {
-      statusCode: status,
-      message: exception.getResponse()['message'],
-      timestamp: new Date(),
+      message: exception.getResponse()['message'] || exception.message,
       requestURL: req.url,
+      statusCode: status,
+      timestamp: new Date(),
     };
 
     if (this.configService.get<string>('NODE_ENV') === 'development') {

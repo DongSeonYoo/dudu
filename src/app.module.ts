@@ -15,6 +15,7 @@ import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { SuccessResponseInterceptor } from './interceptors/response.interceptor';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AuthModule } from './apis/auth/auth.module';
+import { StudentsModule } from './apis/students/students.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AuthModule } from './apis/auth/auth.module';
     }),
     PrismaModule,
     AuthModule,
+    StudentsModule,
   ],
   controllers: [AppController],
   providers: [

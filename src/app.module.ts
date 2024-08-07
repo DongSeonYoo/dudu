@@ -16,6 +16,11 @@ import { SuccessResponseInterceptor } from './interceptors/response.interceptor'
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { AuthModule } from './apis/auth/auth.module';
 import { StudentsModule } from './apis/students/students.module';
+import { ParentModule } from './apis/parent/parent.module';
+import { EnrollmentModule } from './apis/enrollment/enrollment.module';
+import { AttendanceModule } from './apis/attendance/attendance.module';
+import { OutingModule } from './apis/outing/outing.module';
+import { AcademyScheduleModule } from './apis/academy-schedule/academy-schedule.module';
 
 @Module({
   imports: [
@@ -25,6 +30,11 @@ import { StudentsModule } from './apis/students/students.module';
     PrismaModule,
     AuthModule,
     StudentsModule,
+    ParentModule,
+    EnrollmentModule,
+    AttendanceModule,
+    OutingModule,
+    AcademyScheduleModule,
   ],
   controllers: [AppController],
   providers: [

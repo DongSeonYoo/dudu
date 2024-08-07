@@ -9,6 +9,7 @@ import {
   CreateStudentResponseDto,
 } from './dto/create-student.dto';
 import { StudentDetailResponseDto } from './dto/student-detail.dto';
+import { StudentEntity } from './entity/students.entity';
 
 @Injectable()
 export class StudentsService {
@@ -20,9 +21,8 @@ export class StudentsService {
     await Promise.all([this.checkDuplicateStudentNumber(dto.studentNumber)]);
     const studentEntity = dto.toEntity();
 
-    return await this.studentRepository
-      .createStudent(studentEntity)
-      .then(CreateStudentResponseDto.of);
+    const student = await this.studentRepository.createStudent(studentEntity);
+    return CreateStudentResponseDto.of(student);
   }
 
   async checkDuplicateStudentNumber(studentNumber: string): Promise<void> {

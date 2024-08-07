@@ -83,7 +83,7 @@ export class StudentEntity {
     Object.assign(this, data);
   }
 
-  static from(data: Student) {
+  static from(data: Student): StudentEntity {
     return new StudentEntity({
       idx: data.idx,
       type: data.type,
@@ -95,6 +95,7 @@ export class StudentEntity {
       phoneNumber: data.phoneNumber,
       school: data.school,
       studentNumber: data.studentNumber,
+      updatedAt: data.updatedAt,
     });
   }
 }

@@ -29,9 +29,7 @@ export class StudentsController {
   @HttpCode(HttpStatus.OK)
   @ApiSuccess(CreateStudentResponseDto)
   @ApiException(HttpStatus.CONFLICT, '이미 존재하는 학번입니다.')
-  async createStudent(
-    @Body() createStudentDto: CreateStudentRequestDto,
-  ): Promise<CreateStudentResponseDto> {
+  async createStudent(@Body() createStudentDto: CreateStudentRequestDto) {
     return await this.studentsService.createStudent(createStudentDto);
   }
 

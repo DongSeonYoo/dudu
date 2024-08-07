@@ -1,4 +1,4 @@
-import { PickType } from '@nestjs/swagger';
+import { IntersectionType, PickType } from '@nestjs/swagger';
 import { StudentEntity } from '../entity/students.entity';
 import { $Enums } from '@prisma/client';
 import {
@@ -8,8 +8,11 @@ import {
   IsNumberString,
   IsString,
   Length,
+  ValidateNested,
 } from 'class-validator';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
+import { ParentEntity } from 'src/apis/parent/entity/parent.entity';
+import { ParentDto } from 'src/apis/parent/dto/parent.dto';
 
 export class CreateStudentRequestDto extends PickType(StudentEntity, [
   'type',
@@ -56,10 +59,27 @@ export class CreateStudentRequestDto extends PickType(StudentEntity, [
   @Length(4, 4)
   studentNumber: string;
 
-  toEntity(): StudentEntity {
-    return new StudentEntity({
-      ...this,
-    });
+  @ValidateNested()
+  @Type(() => ParentDto)
+  parent: ParentDto;
+
+  toEntity(): { studentEntity: StudentEntity; parentEntity: ParentEntity } {
+    return {
+      studentEntity: new StudentEntity({
+        type: this.type,
+        gender: this.gender,
+        school: this.school,
+        name: this.name,
+        phoneNumber: this.phoneNumber,
+        email: this.email,
+        studentNumber: this.studentNumber,
+        birthDate: this.birthDate,
+      }),
+      parentEntity: new ParentEntity({
+        name: this.parent.name,
+        phoneNumber: this.parent.phoneNumber,
+      }),
+    };
   }
 }
 

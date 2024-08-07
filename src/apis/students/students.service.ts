@@ -9,20 +9,34 @@ import {
   CreateStudentResponseDto,
 } from './dto/create-student.dto';
 import { StudentDetailResponseDto } from './dto/student-detail.dto';
-import { StudentEntity } from './entity/students.entity';
+import { TransactionManager } from 'src/prisma/prisma-transaction.manager';
+import { ParentRepository } from '../parent/parent.repository';
 
 @Injectable()
 export class StudentsService {
-  constructor(private readonly studentRepository: StudentRepository) {}
+  constructor(
+    private readonly studentRepository: StudentRepository,
+    private readonly transactionManager: TransactionManager,
+    private readonly parentRepository: ParentRepository,
+  ) {}
 
   async createStudent(
     dto: CreateStudentRequestDto,
   ): Promise<CreateStudentResponseDto> {
     await Promise.all([this.checkDuplicateStudentNumber(dto.studentNumber)]);
-    const studentEntity = dto.toEntity();
 
-    const student = await this.studentRepository.createStudent(studentEntity);
-    return CreateStudentResponseDto.of(student);
+    const { parentEntity, studentEntity } = dto.toEntity();
+
+    await this.transactionManager.runTransaction(async (tx) => {
+      const { idx: studentIdx } = await this.studentRepository.createStudent(
+        studentEntity,
+        tx,
+      );
+
+      await this.parentRepository.createParent(studentIdx, parentEntity, tx);
+    });
+
+    return CreateStudentResponseDto.of(studentEntity);
   }
 
   async checkDuplicateStudentNumber(studentNumber: string): Promise<void> {

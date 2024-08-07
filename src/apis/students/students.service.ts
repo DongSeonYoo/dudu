@@ -27,16 +27,24 @@ export class StudentsService {
 
     const { parentEntity, studentEntity } = dto.toEntity();
 
-    await this.transactionManager.runTransaction(async (tx) => {
-      const { idx: studentIdx } = await this.studentRepository.createStudent(
-        studentEntity,
-        tx,
-      );
+    const createdStudent = await this.transactionManager.runTransaction(
+      async (tx) => {
+        const createdStudent = await this.studentRepository.createStudent(
+          studentEntity,
+          tx,
+        );
 
-      await this.parentRepository.createParent(studentIdx, parentEntity, tx);
-    });
+        await this.parentRepository.createParent(
+          createdStudent.idx,
+          parentEntity,
+          tx,
+        );
 
-    return CreateStudentResponseDto.of(studentEntity);
+        return createdStudent;
+      },
+    );
+
+    return CreateStudentResponseDto.of(createdStudent);
   }
 
   async checkDuplicateStudentNumber(studentNumber: string): Promise<void> {

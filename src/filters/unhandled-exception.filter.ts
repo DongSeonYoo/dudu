@@ -5,11 +5,15 @@ import {
   HttpStatus,
   Logger,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { IExceptionResponse } from 'src/interfaces/response.interface';
 
 @Catch(Error)
 export class UnhandledExceptionFilter implements ExceptionFilter {
-  constructor(private readonly logger: Logger) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly configService: ConfigService,
+  ) {}
   catch(exception: Error, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const req = ctx.getRequest();
@@ -23,7 +27,7 @@ export class UnhandledExceptionFilter implements ExceptionFilter {
       timestamp: new Date(),
     };
 
-    if (process.env.NODE_ENV !== 'development') {
+    if (this.configService.get<string>('NODE_ENV') === 'development') {
       this.logger.error(
         exception.message,
         exception.stack,

@@ -44,18 +44,23 @@ export class ParentEntity {
    */
   updatedAt: Date;
 
-  constructor(data: Partial<ParentEntity>) {
-    Object.assign(this, data);
+  static create(args: Pick<Parent, 'name' | 'phoneNumber'>): ParentEntity {
+    const parent = new ParentEntity();
+    parent.name = args.name;
+    parent.phoneNumber = args.phoneNumber;
+
+    return parent;
   }
 
-  static from(data: Parent): ParentEntity {
-    return new ParentEntity({
-      idx: data.idx,
-      studentIdx: data.studentIdx,
-      name: data.name,
-      phoneNumber: data.phoneNumber,
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-    });
+  static from(args: Parent): ParentEntity {
+    const parent = new ParentEntity();
+    parent.idx = args.idx;
+    parent.studentIdx = args.studentIdx;
+    parent.name = args.name;
+    parent.phoneNumber = args.phoneNumber;
+    parent.createdAt = args.createdAt;
+    parent.updatedAt = args.updatedAt;
+
+    return parent;
   }
 }

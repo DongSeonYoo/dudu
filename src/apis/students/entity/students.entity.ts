@@ -48,7 +48,7 @@ export class StudentEntity {
    *
    * @example inko51366@naver.com
    */
-  email: string | null;
+  email?: string | null;
 
   /**
    * 학생 고유 번호 4자리

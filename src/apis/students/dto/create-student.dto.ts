@@ -6,6 +6,7 @@ import {
   IsEnum,
   IsNotEmpty,
   IsNumberString,
+  IsOptional,
   IsString,
   Length,
   ValidateNested,
@@ -52,7 +53,8 @@ export class CreateStudentRequestDto extends PickType(StudentEntity, [
   @IsNotEmpty()
   @IsString()
   @IsEmail()
-  email: string;
+  @IsOptional()
+  email: string | null;
 
   @IsNotEmpty()
   @IsNumberString()

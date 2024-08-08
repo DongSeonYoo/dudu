@@ -63,22 +63,18 @@ export class CreateStudentRequestDto extends PickType(StudentEntity, [
   @Type(() => ParentDto)
   parent: ParentDto;
 
-  toEntity(): { studentEntity: StudentEntity; parentEntity: ParentEntity } {
+  toEntity(): { parent: ParentEntity; student: StudentEntity } {
+    const student = StudentEntity.create({
+      ...this,
+    });
+
+    const parent = ParentEntity.create({
+      ...this.parent,
+    });
+
     return {
-      studentEntity: new StudentEntity({
-        type: this.type,
-        gender: this.gender,
-        school: this.school,
-        name: this.name,
-        phoneNumber: this.phoneNumber,
-        email: this.email,
-        studentNumber: this.studentNumber,
-        birthDate: this.birthDate,
-      }),
-      parentEntity: new ParentEntity({
-        name: this.parent.name,
-        phoneNumber: this.parent.phoneNumber,
-      }),
+      student,
+      parent,
     };
   }
 }

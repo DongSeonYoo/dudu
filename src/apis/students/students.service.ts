@@ -25,18 +25,18 @@ export class StudentsService {
   ): Promise<CreateStudentResponseDto> {
     await Promise.all([this.checkDuplicateStudentNumber(dto.studentNumber)]);
 
-    const { parentEntity, studentEntity } = dto.toEntity();
+    const { student, parent } = dto.toEntity();
 
     const createdStudent = await this.transactionManager.runTransaction(
       async (tx) => {
         const createdStudent = await this.studentRepository.createStudent(
-          studentEntity,
+          student,
           tx,
         );
 
         await this.parentRepository.createParent(
           createdStudent.idx,
-          parentEntity,
+          parent,
           tx,
         );
 

@@ -79,23 +79,46 @@ export class StudentEntity {
    */
   updatedAt: Date;
 
-  constructor(data: Partial<StudentEntity>) {
-    Object.assign(this, data);
+  static create(
+    args: Pick<
+      Student,
+      | 'type'
+      | 'gender'
+      | 'school'
+      | 'name'
+      | 'phoneNumber'
+      | 'email'
+      | 'studentNumber'
+      | 'birthDate'
+    >,
+  ) {
+    const student = new StudentEntity();
+    student.type = args.type;
+    student.gender = args.type;
+    student.school = args.school;
+    student.name = args.name;
+    student.phoneNumber = args.phoneNumber;
+    student.email = args.email;
+    student.studentNumber = args.studentNumber;
+    student.birthDate = args.birthDate;
+
+    return student;
   }
 
-  static from(data: Student): StudentEntity {
-    return new StudentEntity({
-      idx: data.idx,
-      type: data.type,
-      birthDate: data.birthDate,
-      createdAt: data.createdAt,
-      email: data.email,
-      gender: data.gender,
-      name: data.name,
-      phoneNumber: data.phoneNumber,
-      school: data.school,
-      studentNumber: data.studentNumber,
-      updatedAt: data.updatedAt,
-    });
+  static from(args: Student): StudentEntity {
+    const student = new StudentEntity();
+    student.idx = args.idx;
+    student.type = args.type;
+    student.gender = args.gender;
+    student.school = args.school;
+    student.name = args.name;
+    student.phoneNumber = args.phoneNumber;
+    student.email = args.email;
+    student.studentNumber = args.studentNumber;
+    student.birthDate = args.birthDate;
+    student.createdAt = args.createdAt;
+    student.updatedAt = args.updatedAt;
+
+    return student;
   }
 }

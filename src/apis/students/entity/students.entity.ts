@@ -18,7 +18,7 @@ export class StudentEntity {
   /**
    * 학생 성별
    *
-   * @example 남 | 여
+   * @example '남' | '여'
    */
   gender: string;
 
@@ -48,7 +48,7 @@ export class StudentEntity {
    *
    * @example inko51366@naver.com
    */
-  email?: string | null;
+  email: string | null;
 
   /**
    * 학생 고유 번호 4자리
@@ -94,7 +94,7 @@ export class StudentEntity {
   ) {
     const student = new StudentEntity();
     student.type = args.type;
-    student.gender = args.type;
+    student.gender = args.gender;
     student.school = args.school;
     student.name = args.name;
     student.phoneNumber = args.phoneNumber;

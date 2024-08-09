@@ -7,6 +7,22 @@ import { Prisma } from '@prisma/client';
 export class StudentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
+  async findStudentByIdx(
+    studentIdx: number,
+    tx?: Prisma.TransactionClient,
+  ): Promise<StudentEntity | null> {
+    return await (tx ?? this.prisma).student
+      .findUnique({
+        where: {
+          idx: studentIdx,
+          deletedAt: null,
+        },
+      })
+      .then((student) => {
+        return student ? StudentEntity.from(student) : null;
+      });
+  }
+
   async createStudent(
     input: StudentEntity,
     tx?: Prisma.TransactionClient,
@@ -45,5 +61,28 @@ export class StudentRepository {
       .then((student) => {
         return student ? StudentEntity.from(student) : null;
       });
+  }
+
+  async updateStudent(
+    studentIdx: number,
+    input: Partial<StudentEntity>,
+    tx?: Prisma.TransactionClient,
+  ): Promise<StudentEntity> {
+    return await (tx ?? this.prisma).student.update({
+      data: {
+        type: input.type,
+        gender: input.gender,
+        school: input.school,
+        name: input.name,
+        phoneNumber: input.phoneNumber,
+        email: input.email,
+        studentNumber: input.studentNumber,
+        birthDate: input.birthDate,
+      },
+      where: {
+        idx: studentIdx,
+        deletedAt: null,
+      },
+    });
   }
 }

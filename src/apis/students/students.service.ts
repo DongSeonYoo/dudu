@@ -11,6 +11,7 @@ import {
 import { StudentDetailResponseDto } from './dto/student-detail.dto';
 import { TransactionManager } from 'src/prisma/prisma-transaction.manager';
 import { ParentRepository } from '../parent/parent.repository';
+import { UpdateStudentRequestDto } from './dto/update-student.dto';
 
 @Injectable()
 export class StudentsService {
@@ -64,5 +65,24 @@ export class StudentsService {
     }
 
     return StudentDetailResponseDto.of(student);
+  }
+
+  async updateStudent(
+    studentIdx: number,
+    dto: UpdateStudentRequestDto,
+  ): Promise<void> {
+    const findStudentResult =
+      await this.studentRepository.findStudentByIdx(studentIdx);
+    if (!findStudentResult) {
+      throw new NotFoundException('학생을 찾을 수 없습니다.');
+    }
+
+    const studentNumber = dto.studentNumber;
+    if (studentNumber) {
+      await this.checkDuplicateStudentNumber(studentNumber);
+    }
+
+    const updateStudentEntity = dto.toEntity();
+    await this.studentRepository.updateStudent(studentIdx, updateStudentEntity);
   }
 }

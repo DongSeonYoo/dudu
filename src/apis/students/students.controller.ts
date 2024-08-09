@@ -6,6 +6,7 @@ import {
   HttpStatus,
   Param,
   Post,
+  Put,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import {
@@ -15,6 +16,7 @@ import {
 import { ApiSuccess } from 'src/decorators/api-success.decorator';
 import { ApiException } from 'src/decorators/api-exception.decorator';
 import { StudentDetailResponseDto } from './dto/student-detail.dto';
+import { UpdateStudentRequestDto } from './dto/update-student.dto';
 
 @Controller('students')
 export class StudentsController {
@@ -44,5 +46,18 @@ export class StudentsController {
   @ApiException(HttpStatus.NOT_FOUND, '학생을 찾을 수 없습니다.')
   async getStudentDetail(@Param('idx') idx: number) {
     return await this.studentsService.getStudentDetail(idx);
+  }
+
+  /**
+   * 학생 정보 수정
+   */
+  @Put(':idx')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiException(HttpStatus.NOT_FOUND, '학생을 찾을 수 없습니다.')
+  async updateStudent(
+    @Param('idx') studentIdx: number,
+    @Body() updateStudentDto: UpdateStudentRequestDto,
+  ) {
+    await this.studentsService.updateStudent(studentIdx, updateStudentDto);
   }
 }

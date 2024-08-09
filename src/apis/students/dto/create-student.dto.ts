@@ -1,9 +1,10 @@
-import { IntersectionType, PickType } from '@nestjs/swagger';
+import { PickType } from '@nestjs/swagger';
 import { StudentEntity } from '../entity/students.entity';
 import { $Enums } from '@prisma/client';
 import {
   IsEmail,
   IsEnum,
+  IsIn,
   IsNotEmpty,
   IsNumberString,
   IsOptional,
@@ -24,14 +25,13 @@ export class CreateStudentRequestDto extends PickType(StudentEntity, [
   'email',
   'studentNumber',
   'birthDate',
-  'gender',
 ]) {
   @IsEnum($Enums.TYPE)
   @IsNotEmpty()
   type: $Enums.TYPE;
 
   @IsNotEmpty()
-  @IsString()
+  @IsIn(['남', '여'])
   gender: string;
 
   @IsNotEmpty()

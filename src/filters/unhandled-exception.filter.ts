@@ -21,7 +21,7 @@ export class UnhandledExceptionFilter implements ExceptionFilter {
     const statusCode = HttpStatus.INTERNAL_SERVER_ERROR;
 
     const response: IExceptionResponse = {
-      message: '서버에서 오류가 발생하였습니다',
+      message: ['서버에서 에러가 발생했습니다.'],
       requestURL: req.url,
       statusCode: statusCode,
       timestamp: new Date(),

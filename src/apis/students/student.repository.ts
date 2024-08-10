@@ -40,7 +40,6 @@ export class StudentRepository {
     const student = await this.prisma.student.findFirst({
       where: {
         studentNumber,
-        deletedAt: null,
       },
     });
 
@@ -84,5 +83,22 @@ export class StudentRepository {
         deletedAt: null,
       },
     });
+  }
+
+  async deleteStudent(
+    studentIdx: number,
+    tx?: Prisma.TransactionClient,
+  ): Promise<void> {
+    await (tx ?? this.prisma).student.update({
+      data: {
+        deletedAt: new Date(),
+      },
+      where: {
+        idx: studentIdx,
+        deletedAt: null,
+      },
+    });
+
+    return;
   }
 }

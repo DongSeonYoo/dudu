@@ -24,9 +24,15 @@ export class StudentsService {
   async createStudent(
     dto: CreateStudentRequestDto,
   ): Promise<CreateStudentResponseDto> {
-    await Promise.all([this.checkDuplicateStudentNumber(dto.studentNumber)]);
-
     const { student, parent } = dto.toEntity();
+
+    await this.studentRepository
+      .findStudentByIdx(student.idx)
+      .then((result) => {
+        if (result) {
+          throw new ConflictException('이미 존재하는 학번입니다.');
+        }
+      });
 
     const createdStudent = await this.transactionManager.runTransaction(
       async (tx) => {
@@ -46,14 +52,6 @@ export class StudentsService {
     );
 
     return CreateStudentResponseDto.of(createdStudent);
-  }
-
-  async checkDuplicateStudentNumber(studentNumber: string): Promise<void> {
-    const result =
-      await this.studentRepository.checkDuplicateStudentNumber(studentNumber);
-    if (result) {
-      throw new ConflictException('이미 존재하는 학번입니다.');
-    }
   }
 
   async getStudentDetail(
@@ -79,10 +77,28 @@ export class StudentsService {
 
     const studentNumber = dto.studentNumber;
     if (studentNumber) {
-      await this.checkDuplicateStudentNumber(studentNumber);
+      await this.studentRepository
+        .checkDuplicateStudentNumber(studentNumber)
+        .then((result) => {
+          if (result) {
+            throw new ConflictException('이미 존재하는 학번입니다.');
+          }
+        });
     }
 
     const updateStudentEntity = dto.toEntity();
     await this.studentRepository.updateStudent(studentIdx, updateStudentEntity);
+  }
+
+  async deleteStudent(studentIdx: number): Promise<void> {
+    const findStudentResult =
+      await this.studentRepository.findStudentByIdx(studentIdx);
+    if (!findStudentResult) {
+      throw new NotFoundException('학생을 찾을 수 없습니다.');
+    }
+
+    await this.studentRepository.deleteStudent(studentIdx);
+
+    return;
   }
 }

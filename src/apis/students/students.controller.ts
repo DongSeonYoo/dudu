@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
@@ -17,8 +18,10 @@ import { ApiSuccess } from 'src/decorators/api-success.decorator';
 import { ApiException } from 'src/decorators/api-exception.decorator';
 import { StudentDetailResponseDto } from './dto/student-detail.dto';
 import { UpdateStudentRequestDto } from './dto/update-student.dto';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('students')
+@ApiTags('Student')
+@Controller('student')
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
@@ -54,10 +57,25 @@ export class StudentsController {
   @Put(':idx')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiException(HttpStatus.NOT_FOUND, '학생을 찾을 수 없습니다.')
+  @ApiException(HttpStatus.CONFLICT, '이미 존재하는 학번입니다.')
   async updateStudent(
     @Param('idx') studentIdx: number,
     @Body() updateStudentDto: UpdateStudentRequestDto,
   ) {
     await this.studentsService.updateStudent(studentIdx, updateStudentDto);
+
+    return;
+  }
+
+  /**
+   * 학생 정보 삭제
+   */
+  @Delete(':idx')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiException(HttpStatus.NOT_FOUND, '학생을 찾을 수 없습니다.')
+  async deleteStudent(@Param('idx') studentIdx: number) {
+    await this.studentsService.deleteStudent(studentIdx);
+
+    return;
   }
 }

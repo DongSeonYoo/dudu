@@ -26,13 +26,13 @@ export class StudentsService {
   ): Promise<CreateStudentResponseDto> {
     const { student, parent } = dto.toEntity();
 
-    await this.studentRepository
-      .findStudentByIdx(student.idx)
-      .then((result) => {
-        if (result) {
-          throw new ConflictException('이미 존재하는 학번입니다.');
-        }
-      });
+    const checkDuplicateStudentNumberResult =
+      await this.studentRepository.checkDuplicateStudentNumber(
+        student.studentNumber,
+      );
+    if (checkDuplicateStudentNumberResult) {
+      throw new ConflictException('이미 존재하는 학번입니다.');
+    }
 
     const createdStudent = await this.transactionManager.runTransaction(
       async (tx) => {

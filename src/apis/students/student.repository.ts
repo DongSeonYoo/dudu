@@ -11,16 +11,14 @@ export class StudentRepository {
     studentIdx: number,
     tx?: Prisma.TransactionClient,
   ): Promise<StudentEntity | null> {
-    return await (tx ?? this.prisma).student
-      .findUnique({
-        where: {
-          idx: studentIdx,
-          deletedAt: null,
-        },
-      })
-      .then((student) => {
-        return student ? StudentEntity.from(student) : null;
-      });
+    const student = await (tx ?? this.prisma).student.findUnique({
+      where: {
+        idx: studentIdx,
+        deletedAt: null,
+      },
+    });
+
+    return student ? StudentEntity.from(student) : null;
   }
 
   async createStudent(

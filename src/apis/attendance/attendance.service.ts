@@ -4,9 +4,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { AttendanceRepository } from './attendance.repository';
-import { TransactionManager } from 'src/prisma/prisma-transaction.manager';
-import { CheckInRequestDto } from './dto/check-in.dto';
-import { CheckOutRequestDto } from './dto/check-out.dto';
 import { StudentRepository } from '../students/student.repository';
 import { AttendanceEntity } from './entity/attendance.entity';
 
@@ -15,7 +12,6 @@ export class AttendanceService {
   constructor(
     private readonly attendanceRepository: AttendanceRepository,
     private readonly studentRepository: StudentRepository,
-    private readonly transactionManager: TransactionManager,
   ) {}
 
   /**
@@ -24,22 +20,21 @@ export class AttendanceService {
    * 2. 등원 유효성 체크
    * 3. 등원 처리
    */
-  async checkIn(dto: CheckInRequestDto): Promise<void> {
+  async checkIn(studentIdx: number): Promise<void> {
     // 1. 학생이 존재하는지 확인
-    const findStudentResult = await this.studentRepository.findStudentByIdx(
-      dto.studentIdx,
-    );
+    const findStudentResult =
+      await this.studentRepository.findStudentByIdx(studentIdx);
     if (!findStudentResult) {
       throw new NotFoundException('존재하지 않는 학생입니다.');
     }
 
     // 2. 등원 유효성 체크
     await this.attendanceRepository
-      .findAttendance(dto.studentIdx)
+      .findTodayAttendance(studentIdx)
       .then(this.validateCheckIn);
 
     // 3. 등원 처리
-    await this.attendanceRepository.checkIn(dto.studentIdx, dto.toEntity());
+    await this.attendanceRepository.checkIn(studentIdx);
 
     return;
   }
@@ -50,22 +45,21 @@ export class AttendanceService {
    * 2. 하원 유효성 체크
    * 3. 하원 처리
    */
-  async checkOut(dto: CheckOutRequestDto): Promise<void> {
+  async checkOut(studentIdx: number): Promise<void> {
     // 1. 학생이 존재하는지 확인
-    const findStudentResult = await this.studentRepository.findStudentByIdx(
-      dto.studentIdx,
-    );
+    const findStudentResult =
+      await this.studentRepository.findStudentByIdx(studentIdx);
     if (!findStudentResult) {
       throw new NotFoundException('존재하지 않는 학생입니다');
     }
 
     // 2. 하원 유효성 체크
-    await this.attendanceRepository
-      .findAttendance(dto.studentIdx)
+    const attendace = await this.attendanceRepository
+      .findTodayAttendance(studentIdx)
       .then(this.validateCheckOut);
 
     // 3. 하원 처리
-    await this.attendanceRepository.checkOut(dto.studentIdx, dto.toEntity());
+    await this.attendanceRepository.checkOut(attendace.idx);
   }
 
   /**
@@ -94,7 +88,9 @@ export class AttendanceService {
    *
    * @param attendance 출결 정보
    */
-  async validateCheckOut(attendance: AttendanceEntity | null): Promise<void> {
+  async validateCheckOut(
+    attendance: AttendanceEntity | null,
+  ): Promise<AttendanceEntity> {
     if (!attendance) {
       throw new BadRequestException('등원하지 않은 학생입니다');
     }
@@ -102,5 +98,7 @@ export class AttendanceService {
     if (attendance.checkOutAt) {
       throw new BadRequestException('이미 하원한 학생입니다');
     }
+
+    return attendance;
   }
 }

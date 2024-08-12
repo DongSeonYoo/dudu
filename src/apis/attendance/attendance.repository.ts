@@ -11,7 +11,7 @@ export class AttendanceRepository {
     private readonly dateUtilService: DateUtilService,
   ) {}
 
-  async findAttendance(
+  async findTodayAttendance(
     studentIdx: number,
     tx?: Prisma.TransactionClient,
   ): Promise<AttendanceEntity | null> {
@@ -33,13 +33,34 @@ export class AttendanceRepository {
 
   async checkIn(
     studentIdx: number,
-    attendace: AttendanceEntity,
     tx?: Prisma.TransactionClient,
-  ): Promise<void> {}
+  ): Promise<void> {
+    await (tx ?? this.prisma).attendance.create({
+      data: {
+        studentIdx: studentIdx,
+        checkInAt: new Date(),
+      },
+    });
+
+    return;
+  }
 
   async checkOut(
-    studentIdx: number,
-    attendace: AttendanceEntity,
+    attendaceIdx: number,
     tx?: Prisma.TransactionClient,
-  ): Promise<void> {}
+  ): Promise<void> {
+    await (tx ?? this.prisma).attendance.update({
+      data: {
+        checkOutAt: new Date(),
+      },
+      where: {
+        idx: attendaceIdx,
+        Student: {
+          deletedAt: null,
+        },
+      },
+    });
+
+    return;
+  }
 }

@@ -13,10 +13,10 @@ model AcademySchedule {
   studentIdx  Int      @map("student_idx")
   academyName String   @map("academy_name") @db.VarChar
   daysOfWeek  Int      @map("days_of_week") @db.SmallInt
-  startedTime DateTime @map("started_time") @db.Time(6)
-  endedTime   DateTime @map("ended_time") @db.Time(6)
   createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  startedTime DateTime @map("started_time") @db.Time(0)
+  endedTime   DateTime @map("ended_time") @db.Time(0)
   Student     Student  @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student_to_academy_schedule")
 
   @@map("academy_schedule")
@@ -26,8 +26,8 @@ model AcademySchedule {
 model Attendance {
   idx        Int       @id @default(autoincrement())
   studentIdx Int       @map("student_idx")
-  checkInAt  DateTime  @map("check_in_at") @db.Time(6)
-  checkOutAt DateTime? @map("check_out_at") @db.Time(6)
+  checkInAt  DateTime  @map("check_in_at") @db.Timetz(6)
+  checkOutAt DateTime? @map("check_out_at") @db.Timetz(6)
   isOuting   Boolean   @default(false) @map("is_outing")
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt  DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
@@ -56,11 +56,11 @@ model Enrollment {
 model Outing {
   studentIdx    Int        @map("student_idx")
   attendanceIdx Int        @map("attendance_idx")
-  startTime     DateTime   @map("start_time") @db.Time(6)
-  endTime       DateTime   @map("end_time") @db.Time(6)
   reason        String
   createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt     DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
+  startTime     DateTime   @map("start_time") @db.Time(0)
+  endTime       DateTime   @map("end_time") @db.Time(0)
   Attendance    Attendance @relation(fields: [attendanceIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_attendance_to_outing")
   Student       Student    @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student_to_outing")
 

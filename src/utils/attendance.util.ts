@@ -9,7 +9,7 @@ export class DateUtilService {
     return today;
   }
 
-  getTommorow(): Date {
+  getTomorrow(): Date {
     const tomorrow = this.getToday();
     tomorrow.setDate(tomorrow.getDate() + 1);
 

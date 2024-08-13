@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import { $Enums, Student } from '@prisma/client';
 
 export class StudentEntity {
@@ -11,14 +12,14 @@ export class StudentEntity {
   /**
    * 학생 타입 (재학생 or 재수생)
    *
-   * @example ['STUDENT', 'REAPEATER']
+   * @example 'STUDENT'
    */
   type: $Enums.TYPE;
 
   /**
    * 학생 성별
    *
-   * @example '남' | '여'
+   * @example '남'
    */
   gender: string;
 

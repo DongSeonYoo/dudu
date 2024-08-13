@@ -23,7 +23,7 @@ export class AttendanceEntity {
   checkInAt: Date;
 
   /**
-   * 등원 시간
+   * 하원 시간
    *
    * @example '10:00'
    */
@@ -61,15 +61,15 @@ export class AttendanceEntity {
   }
 
   static from(args: Attendance): AttendanceEntity {
-    const attendace = new AttendanceEntity();
-    attendace.idx = args.idx;
-    attendace.studentIdx = args.studentIdx;
-    attendace.checkInAt = args.checkInAt;
-    attendace.checkOutAt = args.checkOutAt;
-    attendace.isOuting = args.isOuting;
-    attendace.createdAt = args.createdAt;
-    attendace.updatedAt = args.updatedAt;
+    const attendance = new AttendanceEntity();
+    attendance.idx = args.idx;
+    attendance.studentIdx = args.studentIdx;
+    attendance.checkInAt = args.checkInAt;
+    attendance.checkOutAt = args.checkOutAt;
+    attendance.isOuting = args.isOuting;
+    attendance.createdAt = args.createdAt;
+    attendance.updatedAt = args.updatedAt;
 
-    return attendace;
+    return attendance;
   }
 }

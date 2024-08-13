@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma/prisma.service';
 import { AttendanceEntity } from './entity/attendance.entity';
 import { Injectable } from '@nestjs/common';
 import { DateUtilService } from 'src/utils/attendance.util';
+import { StudentEntity } from '../students/entity/students.entity';
 
 @Injectable()
 export class AttendanceRepository {
@@ -15,7 +16,7 @@ export class AttendanceRepository {
     studentIdx: number,
     tx?: Prisma.TransactionClient,
   ): Promise<AttendanceEntity | null> {
-    const attendace = await (tx ?? this.prisma).attendance.findFirst({
+    const attendance = await (tx ?? this.prisma).attendance.findFirst({
       where: {
         studentIdx: studentIdx,
         Student: {
@@ -23,12 +24,12 @@ export class AttendanceRepository {
         },
         createdAt: {
           gte: this.dateUtilService.getToday(),
-          lt: this.dateUtilService.getTommorow(),
+          lt: this.dateUtilService.getTomorrow(),
         },
       },
     });
 
-    return attendace ? AttendanceEntity.from(attendace) : null;
+    return attendance ? AttendanceEntity.from(attendance) : null;
   }
 
   async checkIn(
@@ -46,7 +47,7 @@ export class AttendanceRepository {
   }
 
   async checkOut(
-    attendaceIdx: number,
+    attendanceIdx: number,
     tx?: Prisma.TransactionClient,
   ): Promise<void> {
     await (tx ?? this.prisma).attendance.update({
@@ -54,7 +55,7 @@ export class AttendanceRepository {
         checkOutAt: new Date(),
       },
       where: {
-        idx: attendaceIdx,
+        idx: attendanceIdx,
         Student: {
           deletedAt: null,
         },
@@ -62,5 +63,30 @@ export class AttendanceRepository {
     });
 
     return;
+  }
+
+  async getAttendanceList(): Promise<
+    Array<{ student: StudentEntity; attendance: AttendanceEntity | null }>
+  > {
+    const res = await this.prisma.student.findMany({
+      include: {
+        Attendance: {
+          where: {
+            createdAt: {
+              gte: this.dateUtilService.getToday(),
+              lt: this.dateUtilService.getTomorrow(),
+            },
+          },
+        },
+      },
+    });
+
+    return res.map((res) => ({
+      student: StudentEntity.from(res),
+      attendance:
+        res.Attendance.length === 0
+          ? null
+          : AttendanceEntity.from(res.Attendance[0]),
+    }));
   }
 }

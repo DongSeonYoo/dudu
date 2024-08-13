@@ -1,6 +1,6 @@
 import {
-  Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
@@ -9,6 +9,8 @@ import {
 import { AttendanceService } from './attendance.service';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiException } from 'src/decorators/api-exception.decorator';
+import { AttendanceListResponseDto } from './dto/attendance-list.dto';
+import { ApiSuccess } from 'src/decorators/api-success.decorator';
 
 @ApiTags('Attendance')
 @Controller('attendance')
@@ -48,4 +50,19 @@ export class AttendanceController {
 
     return;
   }
+
+  /**
+   * 학생 출결 내역 조회 (관리자페이지)
+   */
+  @Get('list')
+  @ApiSuccess([AttendanceListResponseDto])
+  async getAttendanceList(): Promise<AttendanceListResponseDto[]> {
+    return await this.attendanceService.getAttendanceList();
+  }
+
+  /**
+   * 금일 출결 내역 조회
+   */
+  @Get('today/list')
+  async getTodayAttendanceList() {}
 }

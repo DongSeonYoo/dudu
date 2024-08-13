@@ -6,6 +6,7 @@ import {
 import { AttendanceRepository } from './attendance.repository';
 import { StudentRepository } from '../students/student.repository';
 import { AttendanceEntity } from './entity/attendance.entity';
+import { AttendanceListResponseDto } from './dto/attendance-list.dto';
 
 @Injectable()
 export class AttendanceService {
@@ -54,12 +55,12 @@ export class AttendanceService {
     }
 
     // 2. 하원 유효성 체크
-    const attendace = await this.attendanceRepository
+    const attendance = await this.attendanceRepository
       .findTodayAttendance(studentIdx)
       .then(this.validateCheckOut);
 
     // 3. 하원 처리
-    await this.attendanceRepository.checkOut(attendace.idx);
+    await this.attendanceRepository.checkOut(attendance.idx);
   }
 
   /**
@@ -67,7 +68,7 @@ export class AttendanceService {
    *
    * @param attendance 출결 정보
    */
-  async validateCheckIn(attendance: AttendanceEntity | null): Promise<void> {
+  validateCheckIn(attendance: AttendanceEntity | null): void {
     if (!attendance) {
       return;
     }
@@ -88,9 +89,7 @@ export class AttendanceService {
    *
    * @param attendance 출결 정보
    */
-  async validateCheckOut(
-    attendance: AttendanceEntity | null,
-  ): Promise<AttendanceEntity> {
+  validateCheckOut(attendance: AttendanceEntity | null): AttendanceEntity {
     if (!attendance) {
       throw new BadRequestException('등원하지 않은 학생입니다');
     }
@@ -100,5 +99,22 @@ export class AttendanceService {
     }
 
     return attendance;
+  }
+
+  async getAttendanceList(): Promise<AttendanceListResponseDto[]> {
+    const result = await this.attendanceRepository.getAttendanceList();
+
+    return result.map((res) => {
+      return new AttendanceListResponseDto({
+        idx: res.student.idx,
+        name: res.student.name,
+        school: res.student.school,
+        type: res.student.type,
+        gender: res.student.gender,
+        studentNumber: res.student.studentNumber,
+        checkInAt: res.attendance ? res.attendance.checkInAt : null,
+        checkOutAt: res.attendance ? res.attendance.checkOutAt : null,
+      });
+    });
   }
 }

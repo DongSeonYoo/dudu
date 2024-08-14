@@ -1,9 +1,11 @@
-import { PartialType } from '@nestjs/swagger';
+import { OmitType, PartialType } from '@nestjs/swagger';
 import { ParentDto } from './parent.dto';
-import { ParentEntity } from '../entity/parent.entity';
 import { IsNumberString, Length } from 'class-validator';
+import { ParentEntity } from '../entity/parent.entity';
 
-export class UpdateParentRequestDto extends PartialType(ParentDto) {
+export class UpdateParentRequestDto extends PartialType(
+  OmitType(ParentDto, ['toEntity']),
+) {
   /**
    * 학부모 이름
    *
@@ -22,7 +24,8 @@ export class UpdateParentRequestDto extends PartialType(ParentDto) {
 
   toEntity(): Partial<ParentEntity> {
     return {
-      ...this,
+      name: this.name,
+      phoneNumber: this.phoneNumber,
     };
   }
 }

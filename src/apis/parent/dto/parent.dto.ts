@@ -10,4 +10,11 @@ export class ParentDto extends PickType(ParentEntity, ['name', 'phoneNumber']) {
   @IsNotEmpty()
   @IsString()
   phoneNumber: string;
+
+  toEntity(): ParentEntity {
+    return ParentEntity.create({
+      name: this.name,
+      phoneNumber: this.phoneNumber,
+    });
+  }
 }

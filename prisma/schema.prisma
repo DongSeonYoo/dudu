@@ -26,8 +26,8 @@ model AcademySchedule {
 model Attendance {
   idx        Int       @id @default(autoincrement())
   studentIdx Int       @map("student_idx")
-  checkInAt  DateTime  @map("check_in_at") @db.Timetz(6)
-  checkOutAt DateTime? @map("check_out_at") @db.Timetz(6)
+  checkInAt  DateTime  @map("check_in_at") @db.Timestamptz(6)
+  checkOutAt DateTime? @map("check_out_at") @db.Timestamptz(6)
   isOuting   Boolean   @default(false) @map("is_outing")
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt  DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)

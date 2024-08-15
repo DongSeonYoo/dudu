@@ -1,16 +1,20 @@
-import { IntersectionType, PickType } from '@nestjs/swagger';
+import { ApiProperty, IntersectionType, PickType } from '@nestjs/swagger';
 import { IsDate, IsOptional } from 'class-validator';
 import { StudentEntity } from 'src/apis/students/entity/students.entity';
-import { AttendanceEntity } from '../entity/attendance.entity';
-import { TYPE } from '@prisma/client';
+import { AttendanceEntity, IAttendance } from '../entity/attendance.entity';
+import { Transform } from 'class-transformer';
 
 export class AttendanceListRequestDto {
-  /**
-   * 조회 할 날짜
-   */
+  @ApiProperty({
+    description: '날짜 (YYYY-MM-DD)',
+    example: '2024-08-15',
+    required: false,
+    default: '오늘 날짜',
+  })
   @IsDate()
   @IsOptional()
-  date: Date = new Date();
+  @Transform(({ value }) => new Date(value))
+  date: Date;
 }
 
 export class AttendanceListResponseDto extends IntersectionType(

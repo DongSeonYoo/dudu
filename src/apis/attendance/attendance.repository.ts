@@ -23,8 +23,8 @@ export class AttendanceRepository {
           deletedAt: null,
         },
         createdAt: {
-          gte: this.dateUtilService.getToday(),
-          lt: this.dateUtilService.getTomorrow(),
+          gte: this.dateUtilService.getBeginningOfDate(),
+          lt: this.dateUtilService.getBeginningOfDateTommorw(),
         },
       },
     });
@@ -65,19 +65,24 @@ export class AttendanceRepository {
     return;
   }
 
-  async getAttendanceList(): Promise<
+  async getAttendanceListOfDate(
+    date: Date,
+  ): Promise<
     Array<{ student: StudentEntity; attendance: AttendanceEntity | null }>
   > {
-    const res = await this.prisma.student.findMany({
+    const result = await this.prisma.student.findMany({
       include: {
         Attendance: {
           where: {
             createdAt: {
-              gte: this.dateUtilService.getToday(),
-              lt: this.dateUtilService.getTomorrow(),
+              gte: this.dateUtilService.getBeginningOfDate(date),
+              lt: this.dateUtilService.getBeginningOfDateTommorw(date),
             },
           },
         },
+      },
+      where: {
+        deletedAt: null,
       },
     });
 

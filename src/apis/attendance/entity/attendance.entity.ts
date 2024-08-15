@@ -1,4 +1,5 @@
 import { Attendance } from '@prisma/client';
+import { StudentEntity } from 'src/apis/students/entity/students.entity';
 
 export class AttendanceEntity {
   /**

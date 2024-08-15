@@ -6,7 +6,10 @@ import {
 import { AttendanceRepository } from './attendance.repository';
 import { StudentRepository } from '../students/student.repository';
 import { AttendanceEntity } from './entity/attendance.entity';
-import { AttendanceListResponseDto } from './dto/attendance-list.dto';
+import {
+  AttendanceListRequestDto,
+  AttendanceListResponseDto,
+} from './dto/attendance-list.dto';
 
 @Injectable()
 export class AttendanceService {

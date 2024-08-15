@@ -5,11 +5,15 @@ import {
   HttpStatus,
   Param,
   Post,
+  Query,
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { ApiTags } from '@nestjs/swagger';
 import { ApiException } from 'src/decorators/api-exception.decorator';
-import { AttendanceListResponseDto } from './dto/attendance-list.dto';
+import {
+  AttendanceListRequestDto,
+  AttendanceListResponseDto,
+} from './dto/attendance-list.dto';
 import { ApiSuccess } from 'src/decorators/api-success.decorator';
 
 @ApiTags('Attendance')
@@ -56,8 +60,10 @@ export class AttendanceController {
    */
   @Get('list')
   @ApiSuccess([AttendanceListResponseDto])
-  async getAttendanceList(): Promise<AttendanceListResponseDto[]> {
-    return await this.attendanceService.getAttendanceList();
+  async getAttendanceList(
+    @Query() dateQuery: AttendanceListRequestDto,
+  ): Promise<AttendanceListResponseDto[]> {
+    return await this.attendanceService.getAttendanceList(dateQuery);
   }
 
   /**

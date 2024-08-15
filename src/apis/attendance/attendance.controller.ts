@@ -56,7 +56,7 @@ export class AttendanceController {
   }
 
   /**
-   * 학생 출결 내역 조회 (관리자페이지)
+   * 학생 출결 내역 조회
    */
   @Get('list')
   @ApiSuccess([AttendanceListResponseDto])
@@ -65,10 +65,4 @@ export class AttendanceController {
   ): Promise<AttendanceListResponseDto[]> {
     return await this.attendanceService.getAttendanceList(dateQuery);
   }
-
-  /**
-   * 금일 출결 내역 조회
-   */
-  @Get('today/list')
-  async getTodayAttendanceList() {}
 }

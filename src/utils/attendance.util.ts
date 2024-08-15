@@ -1,24 +1,45 @@
 import { Injectable } from '@nestjs/common';
+import dayjs from 'dayjs';
 
 @Injectable()
 export class DateUtilService {
-  getToday(): Date {
-    const today: Date = new Date();
-    today.setHours(0, 0, 0, 0);
+  /**
+   * 특정 날짜의 시작을 가져옵니다.
+   * @param date 시작을 가져오고 싶은 날짜
+   * @default date 오늘 날짜
+   *
+   * @return ISO datestring for prisma
+   *
+   */
+  getBeginningOfDate(date: Date = new Date()): Date {
+    const dateString = dayjs(date).format('YYYY-MM-DD').concat('T00:00:00Z');
 
-    return today;
+    return this.stringToUtcDate(dateString);
   }
 
-  getTomorrow(): Date {
-    const tomorrow = this.getToday();
-    tomorrow.setDate(tomorrow.getDate() + 1);
+  /**
+   * 특정 날짜의 다음 날의 시작을 가져옵니다.
+   * @param date 시작을 가져오고 싶은 날짜
+   * @default date 오늘 날짜
+   *
+   * @returns ISO datestring for prisma
+   */
+  getBeginningOfDateTommorw(date: Date = new Date()): Date {
+    const dateSTring = dayjs(date)
+      .add(1, 'day')
+      .format('YYYY-MM-DD')
+      .concat('T00:00:00Z');
 
-    return tomorrow;
+    return this.stringToUtcDate(dateSTring);
   }
 
-  formatTimeToHHMM(date: Date = new Date()): string {
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
+  /**
+   * ISO datestring을 Date로 변환합니다.
+   *
+   * @param dateString ISO datestring
+   * @returns Date
+   */
+  stringToUtcDate(dateString: string): Date {
+    return dayjs(dateString).toDate();
   }
 }

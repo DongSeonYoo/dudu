@@ -13,7 +13,6 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { ParentEntity } from 'src/apis/parent/entity/parent.entity';
 import { ParentDto } from 'src/apis/parent/dto/parent.dto';
 
 export class CreateStudentRequestDto extends PickType(StudentEntity, [

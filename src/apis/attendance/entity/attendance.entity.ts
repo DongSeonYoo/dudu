@@ -50,9 +50,7 @@ export class AttendanceEntity {
    */
   updatedAt: Date;
 
-  static create(
-    args: Pick<AttendanceEntity, 'studentIdx' | 'checkInAt'>,
-  ): AttendanceEntity {
+  static create(args: IAttendance.ICreateAttendanceRequest): AttendanceEntity {
     const attendance = new AttendanceEntity();
     attendance.studentIdx = args.studentIdx;
     attendance.checkInAt = args.checkInAt;
@@ -71,5 +69,19 @@ export class AttendanceEntity {
     attendance.updatedAt = args.updatedAt;
 
     return attendance;
+  }
+}
+
+export namespace IAttendance {
+  export interface ICreateAttendanceRequest
+    extends Pick<AttendanceEntity, 'studentIdx' | 'checkInAt'> {}
+
+  export interface IAttendanceListResponse
+    extends Pick<
+        StudentEntity,
+        'idx' | 'name' | 'school' | 'type' | 'gender' | 'studentNumber'
+      >,
+      Pick<AttendanceEntity, 'checkOutAt'> {
+    checkInAt: AttendanceEntity['checkInAt'] | null;
   }
 }

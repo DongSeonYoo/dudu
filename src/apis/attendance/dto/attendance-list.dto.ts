@@ -27,20 +27,11 @@ export class AttendanceListResponseDto extends IntersectionType(
   /**
    * 등원 시간
    *
-   * @example 2021-08-01T00:00:00
+   * @example 10:00
    */
   checkInAt: Date | null;
 
-  constructor(args: {
-    idx: number;
-    name: string;
-    school: string;
-    type: TYPE;
-    gender: string;
-    studentNumber: string;
-    checkInAt: Date | null;
-    checkOutAt: Date | null;
-  }) {
+  constructor(args: IAttendance.IAttendanceListResponse) {
     super();
     this.idx = args.idx;
     this.name = args.name;
@@ -52,7 +43,7 @@ export class AttendanceListResponseDto extends IntersectionType(
     this.checkOutAt = args.checkOutAt;
   }
 
-  static from(
+  static of(
     student: StudentEntity,
     attendance: AttendanceEntity | null,
   ): AttendanceListResponseDto {

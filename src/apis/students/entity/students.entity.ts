@@ -1,4 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { $Enums, Student } from '@prisma/client';
 
 export class StudentEntity {
@@ -80,19 +79,7 @@ export class StudentEntity {
    */
   updatedAt: Date;
 
-  static create(
-    args: Pick<
-      Student,
-      | 'type'
-      | 'gender'
-      | 'school'
-      | 'name'
-      | 'phoneNumber'
-      | 'email'
-      | 'studentNumber'
-      | 'birthDate'
-    >,
-  ) {
+  static create(args: IStudent.ICreateStudentRequest): StudentEntity {
     const student = new StudentEntity();
     student.type = args.type;
     student.gender = args.gender;
@@ -121,5 +108,34 @@ export class StudentEntity {
     student.updatedAt = args.updatedAt;
 
     return student;
+  }
+}
+
+export namespace IStudent {
+  export interface ICreateStudentRequest
+    extends Pick<
+      StudentEntity,
+      | 'type'
+      | 'gender'
+      | 'school'
+      | 'name'
+      | 'phoneNumber'
+      | 'email'
+      | 'studentNumber'
+      | 'birthDate'
+    > {}
+
+  export interface IDetailStudentResponse {
+    idx: number;
+    type: $Enums.TYPE;
+    gender: string;
+    school: string;
+    name: string;
+    phoneNumber: string;
+    email: string | null;
+    studentNumber: string;
+    birthDate: Date;
+    createdAt: Date;
+    updatedAt: Date;
   }
 }

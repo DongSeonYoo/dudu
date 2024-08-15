@@ -81,7 +81,7 @@ export class AttendanceRepository {
       },
     });
 
-    return res.map((res) => ({
+    return result.map((res) => ({
       student: StudentEntity.from(res),
       attendance:
         res.Attendance.length === 0

@@ -101,20 +101,14 @@ export class AttendanceService {
     return attendance;
   }
 
-  async getAttendanceList(): Promise<AttendanceListResponseDto[]> {
-    const result = await this.attendanceRepository.getAttendanceList();
+  async getAttendanceList({
+    date,
+  }: AttendanceListRequestDto): Promise<AttendanceListResponseDto[]> {
+    const result =
+      await this.attendanceRepository.getAttendanceListOfDate(date);
 
     return result.map((res) => {
-      return new AttendanceListResponseDto({
-        idx: res.student.idx,
-        name: res.student.name,
-        school: res.student.school,
-        type: res.student.type,
-        gender: res.student.gender,
-        studentNumber: res.student.studentNumber,
-        checkInAt: res.attendance ? res.attendance.checkInAt : null,
-        checkOutAt: res.attendance ? res.attendance.checkOutAt : null,
-      });
+      return AttendanceListResponseDto.of(res.student, res.attendance);
     });
   }
 }

@@ -6,6 +6,7 @@ import { TransactionManager } from 'src/prisma/prisma-transaction.manager';
 import { ParentRepository } from '../parent/parent.repository';
 
 @Module({
+  exports: [StudentsService],
   controllers: [StudentsController],
   providers: [
     StudentsService,

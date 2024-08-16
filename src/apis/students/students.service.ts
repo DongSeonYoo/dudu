@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -12,6 +13,7 @@ import { StudentDetailResponseDto } from './dto/student-detail.dto';
 import { TransactionManager } from 'src/prisma/prisma-transaction.manager';
 import { ParentRepository } from '../parent/parent.repository';
 import { UpdateStudentRequestDto } from './dto/update-student.dto';
+import { StudentEntity } from './entity/students.entity';
 
 @Injectable()
 export class StudentsService {
@@ -20,6 +22,17 @@ export class StudentsService {
     private readonly transactionManager: TransactionManager,
     private readonly parentRepository: ParentRepository,
   ) {}
+
+  async checkExistStudent(studentIdx: number): Promise<StudentEntity> {
+    const findStudentResult =
+      await this.studentRepository.findStudentByIdx(studentIdx);
+
+    if (!findStudentResult) {
+      throw new NotFoundException('학생을 찾을수 없습니다');
+    }
+
+    return findStudentResult;
+  }
 
   async createStudent(
     dto: CreateStudentRequestDto,
@@ -58,10 +71,7 @@ export class StudentsService {
   async getStudentDetail(
     studentIdx: number,
   ): Promise<StudentDetailResponseDto> {
-    const student = await this.studentRepository.getStudentDetail(studentIdx);
-    if (!student) {
-      throw new NotFoundException('학생을 찾을 수 없습니다.');
-    }
+    const student = await this.checkExistStudent(studentIdx);
 
     return StudentDetailResponseDto.of(student);
   }
@@ -70,11 +80,7 @@ export class StudentsService {
     studentIdx: number,
     dto: UpdateStudentRequestDto,
   ): Promise<void> {
-    const findStudentResult =
-      await this.studentRepository.findStudentByIdx(studentIdx);
-    if (!findStudentResult) {
-      throw new NotFoundException('학생을 찾을 수 없습니다.');
-    }
+    await this.checkExistStudent(studentIdx);
 
     const studentNumber = dto.studentNumber;
     if (studentNumber) {
@@ -92,11 +98,7 @@ export class StudentsService {
   }
 
   async deleteStudent(studentIdx: number): Promise<void> {
-    const findStudentResult =
-      await this.studentRepository.findStudentByIdx(studentIdx);
-    if (!findStudentResult) {
-      throw new NotFoundException('학생을 찾을 수 없습니다.');
-    }
+    await this.checkExistStudent(studentIdx);
 
     await this.studentRepository.deleteStudent(studentIdx);
 

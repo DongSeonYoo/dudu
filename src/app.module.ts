@@ -21,6 +21,7 @@ import { EnrollmentModule } from './apis/enrollment/enrollment.module';
 import { AttendanceModule } from './apis/attendance/attendance.module';
 import { OutingModule } from './apis/outing/outing.module';
 import { AcademyScheduleModule } from './apis/academy-schedule/academy-schedule.module';
+import { DateUtilModule } from './utils/date-util/dtae-util.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AcademyScheduleModule } from './apis/academy-schedule/academy-schedule.
       isGlobal: true,
     }),
     PrismaModule,
+    DateUtilModule,
     AuthModule,
     StudentsModule,
     ParentModule,

@@ -2,8 +2,8 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { AttendanceEntity } from './entity/attendance.entity';
 import { Injectable } from '@nestjs/common';
-import { DateUtilService } from 'src/utils/attendance.util';
 import { StudentEntity } from '../students/entity/students.entity';
+import { DateUtilService } from 'src/utils/date-util/date-util.service';
 
 @Injectable()
 export class AttendanceRepository {
@@ -93,5 +93,21 @@ export class AttendanceRepository {
           ? null
           : AttendanceEntity.from(res.Attendance[0]),
     }));
+  }
+
+  async changeOutingState(
+    attendanceIdx: number,
+    tx?: Prisma.TransactionClient,
+  ): Promise<void> {
+    await (tx ?? this.prisma).attendance.update({
+      data: {
+        isOuting: true,
+      },
+      where: {
+        idx: attendanceIdx,
+      },
+    });
+
+    return;
   }
 }

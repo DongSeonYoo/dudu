@@ -14,7 +14,12 @@ export class OutingController {
    */
   @Post()
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiException(HttpStatus.BAD_REQUEST)
+  @ApiException(
+    HttpStatus.BAD_REQUEST,
+    '학생이 존재하지 않습니다',
+    '등원하지 않은 학생입니다',
+    '이미 외출 중인 학생입니다',
+  )
   async goOuting(@Body() goOutingRequestDto: GoOutingRequestDto) {
     await this.outingService.goOuting(goOutingRequestDto);
 

@@ -8,31 +8,16 @@ datasource db {
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model AcademySchedule {
-  idx         Int      @id @default(autoincrement())
-  studentIdx  Int      @map("student_idx")
-  academyName String   @map("academy_name") @db.VarChar
-  daysOfWeek  Int      @map("days_of_week") @db.SmallInt
-  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt   DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
-  startedTime DateTime @map("started_time") @db.Time(0)
-  endedTime   DateTime @map("ended_time") @db.Time(0)
-  Student     Student  @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student_to_academy_schedule")
-
-  @@map("academy_schedule")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Attendance {
   idx        Int       @id @default(autoincrement())
   studentIdx Int       @map("student_idx")
-  checkInAt  DateTime  @map("check_in_at") @db.Timestamptz(6)
-  checkOutAt DateTime? @map("check_out_at") @db.Timestamptz(6)
   isOuting   Boolean   @default(false) @map("is_outing")
   createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt  DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  checkInAt  DateTime  @map("check_in_at") @db.Timestamptz(6)
+  checkOutAt DateTime? @map("check_out_at") @db.Timestamptz(6)
   Student    Student   @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student_to_attendance")
-  Outing     Outing[]
+  outing     outing[]
 
   @@map("attendance")
 }
@@ -50,22 +35,6 @@ model Enrollment {
   Student    Student   @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student_to_enrollment")
 
   @@map("enrollment")
-}
-
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
-model Outing {
-  studentIdx    Int        @map("student_idx")
-  attendanceIdx Int        @map("attendance_idx")
-  reason        String
-  createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
-  updatedAt     DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
-  startTime     DateTime   @map("start_time") @db.Time(0)
-  endTime       DateTime   @map("end_time") @db.Time(0)
-  Attendance    Attendance @relation(fields: [attendanceIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_attendance_to_outing")
-  Student       Student    @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "fk_student_to_outing")
-
-  @@id([studentIdx, attendanceIdx])
-  @@map("outing")
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
@@ -98,11 +67,39 @@ model Student {
   AcademySchedule AcademySchedule[]
   Attendance      Attendance[]
   Enrollment      Enrollment[]
-  Outing          Outing[]
+  outing          outing[]
   Parent          Parent[]
 
   @@unique([studentNumber, deletedAt], map: "unique_student_number_deleted_at")
   @@map("student")
+}
+
+model AcademySchedule {
+  idx          Int      @id(map: "academy_schedule_pk") @default(autoincrement())
+  student_idx  Int
+  academy_name String   @db.VarChar
+  daysOfWeek   Int      @map("days_of_week") @db.SmallInt
+  startedAt    DateTime @map("started_at") @db.Timestamptz(6)
+  endedAt      DateTime @map("ended_at") @db.Timestamptz(6)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  student      Student  @relation(fields: [student_idx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "academy_schedule_student_idx_fk")
+
+  @@map("academy_schedule")
+}
+
+model outing {
+  studentIdx    Int @map("student_idx")
+  attendanceIdx Int @map("attendance_idx")
+  startedAt     DateTime   @db.Timestamptz(6) @map("started_at")
+  endedAt       DateTime   @db.Timestamptz(6) @map("ended_at")
+  reason         String
+  createdAt     DateTime   @default(now()) @db.Timestamptz(6) @map("created_at")
+  updatedAt     DateTime   @default(now()) @db.Timestamptz(6) @map("updated_at")
+  attendance     Attendance @relation(fields: [attendanceIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "attendance_idx_fk")
+  student        Student    @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "student_idx_fk")
+
+  @@id([attendanceIdx, studentIdx], map: "outing_pk")
 }
 
 enum TYPE {

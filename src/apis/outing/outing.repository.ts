@@ -10,7 +10,6 @@ export class OutingRepository {
     private readonly prisma: PrismaService,
     private readonly dateUtilService: DateUtilService,
   ) {}
-
   async goOuting(
     input: OutingEntity,
     tx?: Prisma.TransactionClient,
@@ -20,8 +19,8 @@ export class OutingRepository {
         studentIdx: input.studentIdx,
         attendanceIdx: input.attendanceIdx,
         reason: input.reason,
-        startTime: input.startedTime,
-        endTime: input.endedTime,
+        startedAt: input.startedAt,
+        endedAt: input.endedAt,
       },
     });
 

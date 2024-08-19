@@ -23,16 +23,16 @@ export class OutingEntity {
   /**
    * 외출 시작 시간
    *
-   * @example 11:00
+   * @example 2024-07-01T12:00:00
    */
-  startedTime: Date;
+  startedAt: Date;
 
   /**
    * 외출 종료 시간
    *
-   * @example 12:00
+   * @example 2024-07-01T12:30:00
    */
-  endedTime: Date;
+  endedAt: Date;
 
   /**
    * 생성 일
@@ -53,8 +53,8 @@ export class OutingEntity {
     outing.attendanceIdx = args.attendanceIdx;
     outing.studentIdx = args.studentIdx;
     outing.reason = args.reason;
-    outing.startedTime = args.startedTime;
-    outing.endedTime = args.endedTime;
+    outing.startedAt = args.startedAt;
+    outing.endedAt = args.endedAt;
 
     return outing;
   }
@@ -64,6 +64,6 @@ export namespace IOuting {
   export interface ICreateOuting
     extends Pick<
       OutingEntity,
-      'studentIdx' | 'attendanceIdx' | 'reason' | 'startedTime' | 'endedTime'
+      'studentIdx' | 'attendanceIdx' | 'reason' | 'startedAt' | 'endedAt'
     > {}
 }

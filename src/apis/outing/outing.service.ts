@@ -53,4 +53,6 @@ export class OutingService {
 
     return;
   }
+
+  // async returnFromOuting() {}
 }

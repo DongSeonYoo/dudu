@@ -37,7 +37,7 @@ export class OutingService {
     const findAttendance = await this.attendanceRepository.findTodayAttendance(
       dto.studentIdx,
     );
-    if (!findAttendance) {
+    if (!findAttendance || findAttendance.idx !== dto.attendanceIdx) {
       throw new BadRequestException('등원하지 않은 학생입니다');
     }
 

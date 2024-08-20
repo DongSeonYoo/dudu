@@ -104,4 +104,19 @@ export class StudentsService {
 
     return;
   }
+
+  async getStudentNameByStudentNumber(
+    studentNumber: string,
+  ): Promise<Pick<StudentEntity, 'name'>> {
+    const student =
+      await this.studentRepository.findStudentByStudentNumber(studentNumber);
+
+    if (!student) {
+      throw new NotFoundException('해당하는 학생이 존재하지 않습니다');
+    }
+
+    return {
+      name: student.name,
+    };
+  }
 }

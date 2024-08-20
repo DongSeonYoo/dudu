@@ -99,4 +99,16 @@ export class StudentRepository {
 
     return;
   }
+
+  async findStudentByStudentNumber(
+    studentNumber: string,
+    tx?: Prisma.TransactionClient,
+  ): Promise<StudentEntity | null> {
+    return await (tx ?? this.prisma).student.findFirst({
+      where: {
+        studentNumber,
+        deletedAt: null,
+      },
+    });
+  }
 }

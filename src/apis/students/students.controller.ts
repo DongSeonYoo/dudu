@@ -6,8 +6,10 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   Put,
+  ValidationPipe,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import {
@@ -18,7 +20,9 @@ import { ApiSuccess } from 'src/decorators/api-success.decorator';
 import { ApiException } from 'src/decorators/api-exception.decorator';
 import { StudentDetailResponseDto } from './dto/student-detail.dto';
 import { UpdateStudentRequestDto } from './dto/update-student.dto';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, PickType } from '@nestjs/swagger';
+import { ParseNumberStringPipe } from 'src/filters/parse-number-string.pipe';
+import { StudentEntity } from './entity/students.entity';
 
 @ApiTags('Student')
 @Controller('student')
@@ -77,5 +81,21 @@ export class StudentsController {
     await this.studentsService.deleteStudent(studentIdx);
 
     return;
+  }
+
+  /**
+   * 학생번호로 학생 정보 조회
+   */
+  @Get('number/:studentNumber')
+  @HttpCode(HttpStatus.OK)
+  @ApiException(HttpStatus.NOT_FOUND, '해당하는 학생이 존재하지 않습니다')
+  @ApiException(HttpStatus.BAD_REQUEST, 'Not convertible string to number')
+  @ApiSuccess(PickType(StudentEntity, ['name']))
+  async getStudentByStudentNumber(
+    @Param('studentNumber', ParseNumberStringPipe) studentNumber: string,
+  ) {
+    return await this.studentsService.getStudentNameByStudentNumber(
+      studentNumber,
+    );
   }
 }

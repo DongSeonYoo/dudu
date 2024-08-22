@@ -4,7 +4,12 @@
 
 erd.erd.json
 
+# environment file
 .env
+.env.test
+
+# sql
+init.sql
 
 # Logs
 logs
@@ -37,3 +42,9 @@ lerna-debug.log*
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
+
+# docker
+/environments/docker
+
+# env
+/environments/.env.local

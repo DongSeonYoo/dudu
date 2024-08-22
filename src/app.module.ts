@@ -27,6 +27,7 @@ import { DateUtilModule } from './utils/date-util/dtae-util.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env' : '.env.test',
     }),
     PrismaModule,
     DateUtilModule,

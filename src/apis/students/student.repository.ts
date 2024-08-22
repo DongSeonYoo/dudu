@@ -44,28 +44,12 @@ export class StudentRepository {
     return !!student;
   }
 
-  async getStudentDetail(
-    studentIdx: number,
-    tx?: Prisma.TransactionClient,
-  ): Promise<StudentEntity | null> {
-    return await (tx ?? this.prisma).student
-      .findUnique({
-        where: {
-          idx: studentIdx,
-          deletedAt: null,
-        },
-      })
-      .then((student) => {
-        return student ? StudentEntity.from(student) : null;
-      });
-  }
-
   async updateStudent(
     studentIdx: number,
     input: Partial<StudentEntity>,
     tx?: Prisma.TransactionClient,
   ): Promise<StudentEntity> {
-    return await (tx ?? this.prisma).student.update({
+    const updatedStudent = await (tx ?? this.prisma).student.update({
       data: {
         type: input.type,
         gender: input.gender,
@@ -81,6 +65,8 @@ export class StudentRepository {
         deletedAt: null,
       },
     });
+
+    return StudentEntity.from(updatedStudent);
   }
 
   async deleteStudent(
@@ -104,11 +90,13 @@ export class StudentRepository {
     studentNumber: string,
     tx?: Prisma.TransactionClient,
   ): Promise<StudentEntity | null> {
-    return await (tx ?? this.prisma).student.findFirst({
+    const student = await (tx ?? this.prisma).student.findFirst({
       where: {
         studentNumber,
         deletedAt: null,
       },
     });
+
+    return student ? StudentEntity.from(student) : null;
   }
 }

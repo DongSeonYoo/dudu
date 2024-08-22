@@ -1,0 +1,13 @@
+services:
+  dudu-db:
+    image: postgres:16
+    restart: always
+    environment:
+      POSTGRES_USER: dongseon
+      POSTGRES_PASSWORD: 5136
+      POSTGRES_DB: dudu
+    ports:
+      - 5433:5432
+    volumes:
+      - ./environments/docker/postgres/data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql

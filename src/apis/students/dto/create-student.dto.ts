@@ -88,9 +88,12 @@ export class CreateStudentResponseDto extends PickType(StudentEntity, ['idx']) {
    */
   idx: number;
 
-  static of(student: StudentEntity) {
-    return {
-      idx: student.idx,
-    };
+  constructor(idx: number) {
+    super();
+    Object.assign(this, idx);
+  }
+
+  static of(student: StudentEntity): CreateStudentResponseDto {
+    return new CreateStudentResponseDto(student.idx);
   }
 }

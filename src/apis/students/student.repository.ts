@@ -34,14 +34,17 @@ export class StudentRepository {
       .then(StudentEntity.from);
   }
 
-  async checkDuplicateStudentNumber(studentNumber: string): Promise<boolean> {
+  async checkDuplicateStudentNumber(
+    studentNumber: string,
+  ): Promise<StudentEntity | null> {
     const student = await this.prisma.student.findFirst({
       where: {
-        studentNumber,
+        studentNumber: studentNumber,
+        deletedAt: null,
       },
     });
 
-    return !!student;
+    return student ? StudentEntity.from(student) : null;
   }
 
   async updateStudent(

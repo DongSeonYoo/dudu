@@ -82,15 +82,13 @@ export class StudentsService {
   ): Promise<void> {
     await this.checkExistStudent(studentIdx);
 
-    const studentNumber = dto.studentNumber;
-    if (studentNumber) {
-      await this.studentRepository
-        .checkDuplicateStudentNumber(studentNumber)
-        .then((result) => {
-          if (result) {
-            throw new ConflictException('이미 존재하는 학번입니다.');
-          }
-        });
+    if (dto.studentNumber) {
+      const result = await this.studentRepository.checkDuplicateStudentNumber(
+        dto.studentNumber,
+      );
+      if (result && result.idx !== studentIdx) {
+        throw new ConflictException('이미 존재하는 학번입니다.');
+      }
     }
 
     const updateStudentEntity = dto.toEntity();

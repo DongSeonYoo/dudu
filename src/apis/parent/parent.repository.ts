@@ -33,7 +33,7 @@ export class ParentRepository {
     input: ParentEntity,
     tx?: Prisma.TransactionClient,
   ) {
-    await (tx ?? this.prisma).parent.create({
+    const createdParent = await (tx ?? this.prisma).parent.create({
       data: {
         studentIdx: studentIdx,
         name: input.name,
@@ -41,7 +41,7 @@ export class ParentRepository {
       },
     });
 
-    return;
+    return ParentEntity.from(createdParent);
   }
 
   async updateParent(

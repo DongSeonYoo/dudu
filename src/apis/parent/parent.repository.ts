@@ -7,25 +7,20 @@ import { Injectable } from '@nestjs/common';
 export class ParentRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findStudentIdxByParentIdx(
+  async findParentByIdx(
     parentIdx: number,
     tx?: Prisma.TransactionClient,
-  ): Promise<number | null> {
-    return await (tx ?? this.prisma).parent
-      .findFirst({
-        where: {
-          idx: parentIdx,
-          Student: {
-            deletedAt: null,
-          },
+  ): Promise<ParentEntity | null> {
+    const parent = await (tx ?? this.prisma).parent.findFirst({
+      where: {
+        idx: parentIdx,
+        Student: {
+          deletedAt: null,
         },
-        select: {
-          studentIdx: true,
-        },
-      })
-      .then((parent) => {
-        return parent?.studentIdx ?? null;
-      });
+      },
+    });
+
+    return parent ? ParentEntity.from(parent) : null;
   }
 
   async createParent(

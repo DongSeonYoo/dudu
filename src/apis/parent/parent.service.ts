@@ -7,8 +7,7 @@ export class ParentService {
   constructor(private readonly parentRepository: ParentRepository) {}
 
   async updateParent(parentIdx: number, dto: UpdateParentRequestDto) {
-    const foundStudent =
-      await this.parentRepository.findStudentIdxByParentIdx(parentIdx);
+    const foundStudent = await this.parentRepository.findParentByIdx(parentIdx);
     if (!foundStudent) {
       throw new NotFoundException('해당하는 부모님 정보가 존재하지 않습니다.');
     }

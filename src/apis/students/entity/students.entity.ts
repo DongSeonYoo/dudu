@@ -93,6 +93,13 @@ export class StudentEntity {
     return student;
   }
 
+  static update(args: IStudent.IUpdateStudentRequest): Partial<StudentEntity> {
+    const updateStudentEntity = new StudentEntity();
+    Object.assign(this, args);
+
+    return updateStudentEntity;
+  }
+
   static from(args: Student): StudentEntity {
     const student = new StudentEntity();
     student.idx = args.idx;
@@ -124,6 +131,9 @@ export namespace IStudent {
       | 'studentNumber'
       | 'birthDate'
     > {}
+
+  export interface IUpdateStudentRequest
+    extends Partial<ICreateStudentRequest> {}
 
   export interface IDetailStudentResponse {
     idx: number;

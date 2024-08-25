@@ -23,9 +23,9 @@ export class UpdateParentRequestDto extends PartialType(
   phoneNumber?: string | undefined;
 
   toEntity(): Partial<ParentEntity> {
-    return {
+    return ParentEntity.update({
       name: this.name,
       phoneNumber: this.phoneNumber,
-    };
+    });
   }
 }

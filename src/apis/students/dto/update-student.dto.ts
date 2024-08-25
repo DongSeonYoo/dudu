@@ -63,8 +63,6 @@ export class UpdateStudentRequestDto extends PartialType(
   birthDate?: Date | undefined;
 
   toEntity(): Partial<StudentEntity> {
-    return {
-      ...this,
-    };
+    return StudentEntity.update(this);
   }
 }

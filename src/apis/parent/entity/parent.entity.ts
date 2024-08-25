@@ -52,6 +52,15 @@ export class ParentEntity {
     return parent;
   }
 
+  static update(
+    args: Partial<Pick<ParentEntity, 'name' | 'phoneNumber'>>,
+  ): Partial<ParentEntity> {
+    const updateParentEntity = new ParentEntity();
+    Object.assign(updateParentEntity, args);
+
+    return updateParentEntity;
+  }
+
   static from(args: Parent): ParentEntity {
     const parent = new ParentEntity();
     parent.idx = args.idx;

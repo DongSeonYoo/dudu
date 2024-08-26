@@ -43,8 +43,8 @@ export class ParentRepository {
     parentIdx: number,
     input: Partial<ParentEntity>,
     tx?: Prisma.TransactionClient,
-  ) {
-    await (tx ?? this.prisma).parent.update({
+  ): Promise<ParentEntity> {
+    const parent = await (tx ?? this.prisma).parent.update({
       data: {
         name: input.name,
         phoneNumber: input.phoneNumber,
@@ -57,6 +57,6 @@ export class ParentRepository {
       },
     });
 
-    return;
+    return ParentEntity.from(parent);
   }
 }

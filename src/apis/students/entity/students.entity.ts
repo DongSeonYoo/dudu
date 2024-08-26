@@ -95,7 +95,7 @@ export class StudentEntity {
 
   static update(args: IStudent.IUpdateStudentRequest): Partial<StudentEntity> {
     const updateStudentEntity = new StudentEntity();
-    Object.assign(this, args);
+    Object.assign(updateStudentEntity, args);
 
     return updateStudentEntity;
   }

@@ -2,54 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { StudentRepository } from '../student.repository';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { StudentEntity } from '../entity/students.entity';
-import { $Enums, Prisma, Student } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { seedStudents, studentSeedList } from 'test/util/seed/student-seed';
 
 describe('StudentRepository Test', () => {
   let studentRepository: StudentRepository;
   let prisma: PrismaService;
-
-  const studentSeedList = [
-    {
-      idx: 1,
-      name: '홍길동',
-      studentNumber: '1234',
-      birthDate: new Date('2000-01-01'),
-      email: 'email1@naver.com',
-      phoneNumber: '01012345678',
-      gender: 'male',
-      school: 'school',
-      type: $Enums.TYPE.STUDENT,
-    },
-    {
-      idx: 2,
-      name: '홍길동2',
-      studentNumber: '2234',
-      birthDate: new Date('2000-01-01'),
-      email: 'email2@naver.com',
-      phoneNumber: '01012345678',
-      gender: 'male',
-      school: 'school',
-      type: $Enums.TYPE.STUDENT,
-    },
-    {
-      idx: 3,
-      name: '홍길동3',
-      studentNumber: '3234',
-      birthDate: new Date('2000-01-01'),
-      email: 'email3@naver.com',
-      phoneNumber: '01012345678',
-      gender: 'male',
-      school: 'school',
-      type: $Enums.TYPE.STUDENT,
-    },
-  ];
-
-  async function seedStudents(studentList: Prisma.StudentCreateInput[]) {
-    await prisma.student.createMany({
-      data: studentList,
-    });
-  }
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -64,6 +22,7 @@ describe('StudentRepository Test', () => {
   });
 
   afterAll(async () => {
+    await prisma.parent.deleteMany({});
     await prisma.student.deleteMany({});
 
     await prisma.$disconnect();

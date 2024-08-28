@@ -14,6 +14,7 @@ import {
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
 import { ParentDto } from 'src/apis/parent/dto/parent.dto';
+import { EnrollmentCreateRequestDto } from 'src/apis/enrollment/dto/enrollment.dto';
 
 export class CreateStudentRequestDto extends PickType(StudentEntity, [
   'type',
@@ -63,6 +64,10 @@ export class CreateStudentRequestDto extends PickType(StudentEntity, [
   @ValidateNested()
   @Type(() => ParentDto)
   parent: ParentDto;
+
+  @ValidateNested()
+  @Type(() => EnrollmentCreateRequestDto)
+  enrollment: EnrollmentCreateRequestDto;
 
   toEntity(): StudentEntity {
     const student = StudentEntity.create({

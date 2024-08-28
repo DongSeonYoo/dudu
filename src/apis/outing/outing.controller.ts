@@ -19,7 +19,7 @@ export class OutingController {
     '학생이 존재하지 않습니다',
     '등원하지 않은 학생입니다',
     '이미 외출 중인 학생입니다',
-    '외출 시작 시간은 현재 시간보다 이후이어야 하며, 외출 종료 시간보다 이전이어야 합니다',
+    'startedAt은 현재 시간보다 이후여야 하며, endedAt보다 이전이어야 합니다.',
   )
   async goOuting(@Body() goOutingRequestDto: GoOutingRequestDto) {
     await this.outingService.goOuting(goOutingRequestDto);

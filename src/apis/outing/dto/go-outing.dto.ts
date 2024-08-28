@@ -8,7 +8,7 @@ import {
   Validate,
 } from 'class-validator';
 import { Transform, Type } from 'class-transformer';
-import { OutingStartedAtValidation } from '../validation/outing.started-at.validation';
+import { StartedAtEndedAtValidation } from 'src/validation/started-ended.validation';
 
 export class GoOutingRequestDto extends PickType(OutingEntity, [
   'studentIdx',
@@ -32,7 +32,7 @@ export class GoOutingRequestDto extends PickType(OutingEntity, [
   @IsNotEmpty()
   @IsDate()
   @Type(() => Date)
-  @Validate(OutingStartedAtValidation)
+  @Validate(StartedAtEndedAtValidation)
   startedAt: Date;
 
   @IsNotEmpty()

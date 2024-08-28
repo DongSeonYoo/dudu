@@ -14,6 +14,8 @@ import { TransactionManager } from 'src/prisma/prisma-transaction.manager';
 import { ParentRepository } from '../parent/parent.repository';
 import { UpdateStudentRequestDto } from './dto/update-student.dto';
 import { StudentEntity } from './entity/students.entity';
+import { EnrollmentService } from '../enrollment/enrollment.service';
+import { EnrollmentRepository } from '../enrollment/entollment.repository';
 
 @Injectable()
 export class StudentsService {
@@ -21,6 +23,8 @@ export class StudentsService {
     private readonly studentRepository: StudentRepository,
     private readonly transactionManager: TransactionManager,
     private readonly parentRepository: ParentRepository,
+    private readonly enrollmentService: EnrollmentService,
+    private readonly enrollmentRepository: EnrollmentRepository,
   ) {}
 
   async checkExistStudent(studentIdx: number): Promise<StudentEntity> {
@@ -48,6 +52,11 @@ export class StudentsService {
       throw new ConflictException('이미 존재하는 학번입니다.');
     }
 
+    const enrollment = this.enrollmentService.createEnrollmentInfo(
+      student.type,
+      dto.enrollment.month,
+    );
+
     const createdStudent = await this.transactionManager.runTransaction(
       async (tx) => {
         const createdStudent = await this.studentRepository.createStudent(
@@ -58,6 +67,12 @@ export class StudentsService {
         await this.parentRepository.createParent(
           createdStudent.idx,
           parent,
+          tx,
+        );
+
+        await this.enrollmentRepository.createEnrollment(
+          createdStudent.idx,
+          enrollment,
           tx,
         );
 

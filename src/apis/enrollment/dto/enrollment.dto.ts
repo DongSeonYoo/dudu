@@ -22,6 +22,9 @@ export class EnrollmentCreateRequestDto extends PickType(EnrollmentEntity, [
   /**
    * 등록할 기간 (달)
    *
+   * month 사실 필요없을듯? startedAt, endedAt으로 계산 가능할듯
+   * dateUtilService클래스에서 커스텀 함수로 만들어서 사용하면 될뜼?
+   *
    * @example 1
    * @default 1
    */

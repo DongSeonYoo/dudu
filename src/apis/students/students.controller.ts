@@ -20,7 +20,7 @@ import { ApiSuccess } from 'src/decorators/api-success.decorator';
 import { ApiException } from 'src/decorators/api-exception.decorator';
 import { StudentDetailResponseDto } from './dto/student-detail.dto';
 import { UpdateStudentRequestDto } from './dto/update-student.dto';
-import { ApiTags, PickType } from '@nestjs/swagger';
+import { ApiOperation, ApiProperty, ApiTags, PickType } from '@nestjs/swagger';
 import { ParseNumberStringPipe } from 'src/filters/parse-number-string.pipe';
 import { StudentEntity } from './entity/students.entity';
 
@@ -34,6 +34,10 @@ export class StudentsController {
    *
    * @param createStudentDto
    */
+  @ApiOperation({
+    description:
+      '학생과 학생의 부모님을 생성하고, 학생 등록 정보를 생성합니다.',
+  })
   @Post()
   @HttpCode(HttpStatus.OK)
   @ApiSuccess(CreateStudentResponseDto)

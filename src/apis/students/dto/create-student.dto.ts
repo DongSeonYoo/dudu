@@ -95,7 +95,7 @@ export class CreateStudentResponseDto extends PickType(StudentEntity, ['idx']) {
 
   constructor(idx: number) {
     super();
-    Object.assign(this, idx);
+    this.idx = idx;
   }
 
   static of(student: StudentEntity): CreateStudentResponseDto {

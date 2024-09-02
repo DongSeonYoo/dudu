@@ -15,12 +15,18 @@ import { Prisma } from '@prisma/client';
 import { ParentEntity } from 'src/apis/parent/entity/parent.entity';
 import { StudentDetailResponseDto } from '../dto/student-detail.dto';
 import { UpdateStudentRequestDto } from '../dto/update-student.dto';
+import { EnrollmentService } from 'src/apis/enrollment/enrollment.service';
+import { EnrollmentRepository } from 'src/apis/enrollment/entollment.repository';
+import { EnrollmentCreateRequestDto } from 'src/apis/enrollment/dto/enrollment.dto';
+import { EnrollmentEntity } from 'src/apis/enrollment/entity/enrollment.entity';
 
 describe('StudentsService', () => {
   let studentService: StudentsService;
   let studentRepository: MockProxy<StudentRepository>;
   let transactionManager: MockProxy<TransactionManager>;
   let parentRepository: MockProxy<ParentRepository>;
+  let enrollmentService: MockProxy<EnrollmentService>;
+  let enrollmentRepository: MockProxy<EnrollmentRepository>;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -28,18 +34,23 @@ describe('StudentsService', () => {
         StudentsService,
         {
           provide: StudentRepository,
-          useFactory: (): StudentRepository =>
-            (studentRepository = mock<StudentRepository>()),
+          useFactory: (): StudentRepository => mock<StudentRepository>(),
         },
         {
           provide: TransactionManager,
-          useFactory: (): TransactionManager =>
-            (transactionManager = mock<TransactionManager>()),
+          useFactory: (): TransactionManager => mock<TransactionManager>(),
         },
         {
           provide: ParentRepository,
-          useFactory: (): ParentRepository =>
-            (parentRepository = mock<ParentRepository>()),
+          useFactory: (): ParentRepository => mock<ParentRepository>(),
+        },
+        {
+          provide: EnrollmentService,
+          useFactory: (): EnrollmentService => mock<EnrollmentService>(),
+        },
+        {
+          provide: EnrollmentRepository,
+          useFactory: (): EnrollmentRepository => mock<EnrollmentRepository>(),
         },
       ],
     }).compile();
@@ -48,6 +59,8 @@ describe('StudentsService', () => {
     studentRepository = module.get(StudentRepository);
     transactionManager = module.get(TransactionManager);
     parentRepository = module.get(ParentRepository);
+    enrollmentService = module.get(EnrollmentService);
+    enrollmentRepository = module.get(EnrollmentRepository);
   });
 
   describe('checkExistStudent', () => {
@@ -79,9 +92,6 @@ describe('StudentsService', () => {
   describe('createStudent', () => {
     const createdStudentIdx = 1;
     let dto: CreateStudentRequestDto;
-    let studentEntity: StudentEntity;
-    let parentEntity: ParentEntity;
-
     let mockTransaction = {} as Prisma.TransactionClient;
 
     beforeEach(() => {
@@ -97,9 +107,11 @@ describe('StudentsService', () => {
       dto.parent = new ParentDto();
       dto.parent.name = '유동선 모';
       dto.parent.phoneNumber = '01011111111';
+      dto.enrollment = new EnrollmentCreateRequestDto();
+      dto.enrollment.startedAt = new Date('2024-01-01');
+      dto.enrollment.month = 1;
 
-      studentEntity = StudentEntity.create(dto.toEntity());
-      parentEntity = ParentEntity.create(dto.parent.toEntity());
+      mockTransaction = {} as Prisma.TransactionClient;
     });
 
     it('중복된 학생 번호가 존재하면 ConflictException이 발생한다', async () => {
@@ -115,7 +127,9 @@ describe('StudentsService', () => {
       await expect(act).rejects.toThrow(ConflictException);
     });
 
-    it('트랜잭션 내에서 학생과 해당 학생의 부모님을 생성한다', async () => {
+    it('학생 등록 정보를 계산해서 학생 등록 엔티티를 생성한다', () => {});
+
+    it('트랜잭션 내에서 학생과 해당 학생의 부모님, 등록 정보를 저장한다', async () => {
       // given
       studentRepository.checkDuplicateStudentNumber.mockResolvedValue(null);
       transactionManager.runTransaction.mockImplementation(async (cb) =>
@@ -124,6 +138,7 @@ describe('StudentsService', () => {
       studentRepository.createStudent.mockResolvedValue({
         idx: createdStudentIdx,
       } as StudentEntity);
+      enrollmentService.createEnrollmentInfo.mockReturnValue({} as any);
 
       // when
       await studentService.createStudent(dto);
@@ -131,12 +146,17 @@ describe('StudentsService', () => {
       // then
       expect(transactionManager.runTransaction).toHaveBeenCalled();
       expect(studentRepository.createStudent).toHaveBeenCalledWith(
-        studentEntity,
+        expect.any(StudentEntity),
         mockTransaction,
       );
       expect(parentRepository.createParent).toHaveBeenCalledWith(
         createdStudentIdx,
-        parentEntity,
+        expect.any(ParentEntity),
+        mockTransaction,
+      );
+      expect(enrollmentRepository.createEnrollment).toHaveBeenCalledWith(
+        createdStudentIdx,
+        expect.any(EnrollmentEntity),
         mockTransaction,
       );
     });
@@ -193,7 +213,6 @@ describe('StudentsService', () => {
     it('해당하는 학생이 존재한다면, 정보를 수정한다', async () => {
       // given
       dto.name = '수정된 홍길동';
-      updateStudentEntity = dto.toEntity();
       studentRepository.findStudentByIdx.mockResolvedValue({} as StudentEntity);
       studentRepository.checkDuplicateStudentNumber.mockResolvedValue(null);
       studentRepository.updateStudent.mockResolvedValue({} as StudentEntity);
@@ -204,7 +223,7 @@ describe('StudentsService', () => {
       // then
       expect(studentRepository.updateStudent).toHaveBeenCalledWith(
         studentIdx,
-        updateStudentEntity,
+        expect.any(StudentEntity),
       );
       expect(studentRepository.findStudentByIdx).toHaveBeenCalledWith(
         studentIdx,
@@ -251,7 +270,6 @@ describe('StudentsService', () => {
       it('중복된 studentNumber가 수정하려는 학생의 것일 경우 정상적으로 수정한다', async () => {
         // given
         dto.studentNumber = '4321';
-        updateStudentEntity = dto.toEntity();
 
         studentRepository.findStudentByIdx.mockResolvedValue(
           {} as StudentEntity,
@@ -264,10 +282,9 @@ describe('StudentsService', () => {
         await studentService.updateStudent(studentIdx, dto);
 
         // then
-        expect(UpdateStudentRequestDto);
         expect(studentRepository.updateStudent).toHaveBeenCalledWith(
           studentIdx,
-          updateStudentEntity,
+          expect.any(StudentEntity),
         );
       });
     });

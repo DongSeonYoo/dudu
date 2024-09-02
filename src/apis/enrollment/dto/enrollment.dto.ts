@@ -1,23 +1,18 @@
 import { PickType } from '@nestjs/swagger';
-import { EnrollmentEntity } from '../entity/enrollment.entity';
+import { EnrollmentEntity, IEnrollment } from '../entity/enrollment.entity';
 import { IsDate, IsNotEmpty, IsOptional, Validate } from 'class-validator';
 import { Type } from 'class-transformer';
 import { StartedAtEndedAtValidation } from 'src/validation/started-ended.validation';
+import { $Enums } from '@prisma/client';
 
 export class EnrollmentCreateRequestDto extends PickType(EnrollmentEntity, [
   'startedAt',
-  'endedAt',
 ]) {
   @IsNotEmpty()
   @IsDate()
   @Type(() => Date)
   @Validate(StartedAtEndedAtValidation)
   startedAt: Date;
-
-  @IsNotEmpty()
-  @IsDate()
-  @Type(() => Date)
-  endedAt: Date;
 
   /**
    * 등록할 기간 (달)
@@ -30,4 +25,8 @@ export class EnrollmentCreateRequestDto extends PickType(EnrollmentEntity, [
    */
   @IsOptional()
   month: number = 1;
+
+  toEntity(args: IEnrollment.ICreateEnrollment): EnrollmentEntity {
+    return EnrollmentEntity.create(args);
+  }
 }

@@ -16,6 +16,7 @@ import { UpdateStudentRequestDto } from './dto/update-student.dto';
 import { StudentEntity } from './entity/students.entity';
 import { EnrollmentService } from '../enrollment/enrollment.service';
 import { EnrollmentRepository } from '../enrollment/entollment.repository';
+import { EnrollmentEntity } from '../enrollment/entity/enrollment.entity';
 
 @Injectable()
 export class StudentsService {
@@ -52,10 +53,13 @@ export class StudentsService {
       throw new ConflictException('이미 존재하는 학번입니다.');
     }
 
-    const enrollment = this.enrollmentService.createEnrollmentInfo(
+    // 등록 정보 생성
+    const enrollmentInfo = this.enrollmentService.createEnrollmentInfo(
       student.type,
+      dto.enrollment.startedAt,
       dto.enrollment.month,
     );
+    const enrollment = dto.enrollment.toEntity(enrollmentInfo);
 
     const createdStudent = await this.transactionManager.runTransaction(
       async (tx) => {

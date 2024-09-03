@@ -127,7 +127,34 @@ describe('StudentsService', () => {
       await expect(act).rejects.toThrow(ConflictException);
     });
 
-    it('학생 등록 정보를 계산해서 학생 등록 엔티티를 생성한다', () => {});
+    it('학생 생성 시 등록 정보를 계산한다', async () => {
+      // given
+      const mockEnrollmentInfo = {
+        amount: 650000,
+        startedAt: dto.enrollment.startedAt,
+        endedAt: new Date('2024-01-31'),
+      };
+      studentRepository.checkDuplicateStudentNumber.mockResolvedValue(null);
+      enrollmentService.createEnrollmentInfo.mockReturnValue(
+        mockEnrollmentInfo,
+      );
+      transactionManager.runTransaction.mockImplementation(async (cb) =>
+        cb(mockTransaction),
+      );
+      studentRepository.createStudent.mockResolvedValue({
+        idx: 1,
+      } as StudentEntity);
+
+      // when
+      await studentService.createStudent(dto);
+
+      // then
+      expect(enrollmentService.createEnrollmentInfo).toHaveBeenCalledWith(
+        dto.type,
+        dto.enrollment.startedAt,
+        dto.enrollment.month,
+      );
+    });
 
     it('트랜잭션 내에서 학생과 해당 학생의 부모님, 등록 정보를 저장한다', async () => {
       // given
@@ -208,7 +235,6 @@ describe('StudentsService', () => {
   describe('updateStudent', () => {
     const studentIdx = 1;
     const dto = new UpdateStudentRequestDto();
-    let updateStudentEntity: Partial<StudentEntity>;
 
     it('해당하는 학생이 존재한다면, 정보를 수정한다', async () => {
       // given
@@ -292,7 +318,6 @@ describe('StudentsService', () => {
     it('수정 정보에 studentNumber가 포함되어 있지 않다면 중복 검사를 수행하지 않는다', async () => {
       // given
       dto.studentNumber = undefined;
-      updateStudentEntity = dto.toEntity();
 
       // when
       studentRepository.findStudentByIdx.mockResolvedValue({} as StudentEntity);

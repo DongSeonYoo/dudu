@@ -159,7 +159,6 @@ describe('AttendanceRepository Test', () => {
 
       // when
       const act = await attendanceRepository.getAttendanceListOfDate(date);
-      console.log(act);
 
       // then
       expect(act[0].student).toBeInstanceOf(StudentEntity);

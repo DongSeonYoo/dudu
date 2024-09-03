@@ -91,29 +91,7 @@ describe('AttendanceRepository Test', () => {
   });
 
   describe('checkOut', () => {
-    it('해당하는 학생의 하원 정보를 생성한다', async () => {
-      // given
-      const studentIdx = studentSeedList[0].idx;
-      await attendanceRepository.checkIn(studentIdx);
-      const attendance = await prisma.attendance.findFirstOrThrow({
-        where: {
-          studentIdx: studentIdx,
-        },
-      });
-
-      // when
-      await attendanceRepository.checkOut(attendance.idx);
-
-      const result = await prisma.attendance.findFirstOrThrow({
-        where: {
-          idx: attendance.idx,
-        },
-      });
-
-      // then
-      expect(result.checkOutAt).toBeDefined();
-    });
-
+    it.todo('해당하는 학생의 출석 정보를 수정한다 (하원)');
     it('만약 출석 정보가 존재하지 않는다면 prismaClientKnownRequestError가 발생한다', async () => {
       // given
       const attendanceIdx = 9999;

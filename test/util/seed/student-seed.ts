@@ -1,4 +1,4 @@
-import { $Enums, Prisma, PrismaClient } from '@prisma/client';
+import { $Enums, Prisma, PrismaClient, Student } from '@prisma/client';
 
 export const studentSeedList = [
   {
@@ -40,8 +40,10 @@ const prisma = new PrismaClient();
 
 export async function seedStudents(
   studentList: Prisma.StudentCreateManyInput[],
-) {
+): Promise<Student[]> {
   await prisma.student.createMany({
     data: studentList,
   });
+
+  return await prisma.student.findMany().then((res) => res);
 }

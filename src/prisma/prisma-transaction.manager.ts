@@ -7,7 +7,7 @@ export class TransactionManager {
   constructor(private readonly prisma: PrismaService) {}
 
   runTransaction<T>(
-    callback: (tx?: Prisma.TransactionClient) => Promise<T>,
+    callback: (tx: Prisma.TransactionClient) => Promise<T>,
   ): Promise<T> {
     return this.prisma.$transaction(callback);
   }

@@ -2,6 +2,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator markdown {
+  provider = "prisma-markdown"
+  output   = "./ERD.md"
+  title    = "Dudu"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -25,7 +31,7 @@ model Attendance {
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Enrollment {
   idx        Int       @id @default(autoincrement())
-  studentIdx Int       @map("student_idx")
+  studentIdx Int       @unique(map: "uq_enrollment_student_idx") @map("student_idx")
   startedAt  DateTime  @map("started_at") @db.Timestamptz(6)
   endedAt    DateTime  @map("ended_at") @db.Timestamptz(6)
   amount     Int
@@ -66,7 +72,7 @@ model Student {
   studentNumber   String            @map("student_number") @db.Char(4)
   AcademySchedule AcademySchedule[]
   Attendance      Attendance[]
-  Enrollment      Enrollment[]
+  Enrollment      Enrollment?
   outing          outing[]
   Parent          Parent[]
 
@@ -89,15 +95,15 @@ model AcademySchedule {
 }
 
 model outing {
-  studentIdx    Int @map("student_idx")
-  attendanceIdx Int @map("attendance_idx")
-  startedAt     DateTime   @db.Timestamptz(6) @map("started_at")
-  endedAt       DateTime   @db.Timestamptz(6) @map("ended_at")
-  reason         String
-  createdAt     DateTime   @default(now()) @db.Timestamptz(6) @map("created_at")
-  updatedAt     DateTime   @default(now()) @db.Timestamptz(6) @map("updated_at")
-  attendance     Attendance @relation(fields: [attendanceIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "attendance_idx_fk")
-  student        Student    @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "student_idx_fk")
+  studentIdx    Int        @map("student_idx")
+  attendanceIdx Int        @map("attendance_idx")
+  startedAt     DateTime   @map("started_at") @db.Timestamptz(6)
+  endedAt       DateTime   @map("ended_at") @db.Timestamptz(6)
+  reason        String
+  createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt     DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
+  attendance    Attendance @relation(fields: [attendanceIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "attendance_idx_fk")
+  student       Student    @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "student_idx_fk")
 
   @@id([attendanceIdx, studentIdx], map: "outing_pk")
 }

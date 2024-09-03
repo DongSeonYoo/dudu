@@ -53,7 +53,9 @@ export class EnrollmentEntity {
 
   static create(args: IEnrollment.ICreateEnrollment): EnrollmentEntity {
     const enrollment = new EnrollmentEntity();
-    Object.assign(enrollment, args);
+    enrollment.amount = args.amount;
+    enrollment.startedAt = args.startedAt;
+    enrollment.endedAt = args.endedAt;
 
     return enrollment;
   }

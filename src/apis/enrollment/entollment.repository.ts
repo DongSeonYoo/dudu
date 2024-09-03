@@ -21,6 +21,6 @@ export class EnrollmentRepository {
       },
     });
 
-    return EnrollmentEntity.create(enrollment);
+    return EnrollmentEntity.from(enrollment);
   }
 }

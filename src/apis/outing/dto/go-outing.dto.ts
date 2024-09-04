@@ -7,11 +7,10 @@ import {
   IsString,
   Validate,
 } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { Type } from 'class-transformer';
 
 export class GoOutingRequestDto extends PickType(OutingEntity, [
   'studentIdx',
-  'attendanceIdx',
   'reason',
   'startedAt',
   'endedAt',
@@ -19,10 +18,6 @@ export class GoOutingRequestDto extends PickType(OutingEntity, [
   @IsNotEmpty()
   @IsNumber()
   studentIdx: number;
-
-  @IsNotEmpty()
-  @IsNumber()
-  attendanceIdx: number;
 
   @IsNotEmpty()
   @IsString()
@@ -38,10 +33,10 @@ export class GoOutingRequestDto extends PickType(OutingEntity, [
   @Type(() => Date)
   endedAt: Date;
 
-  toEntity(): OutingEntity {
+  toEntity(attendanceIdx: number): OutingEntity {
     const outing = OutingEntity.create({
       studentIdx: this.studentIdx,
-      attendanceIdx: this.attendanceIdx,
+      attendanceIdx: attendanceIdx,
       reason: this.reason,
       startedAt: this.startedAt,
       endedAt: this.endedAt,

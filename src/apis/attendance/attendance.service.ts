@@ -71,7 +71,7 @@ export class AttendanceService {
    *
    * @param attendance 출결 정보
    */
-  validateCheckIn(attendance: AttendanceEntity | null): void {
+  private validateCheckIn(attendance: AttendanceEntity | null): void {
     if (!attendance) {
       return;
     }
@@ -92,7 +92,9 @@ export class AttendanceService {
    *
    * @param attendance 출결 정보
    */
-  validateCheckOut(attendance: AttendanceEntity | null): AttendanceEntity {
+  private validateCheckOut(
+    attendance: AttendanceEntity | null,
+  ): AttendanceEntity {
     if (!attendance) {
       throw new BadRequestException('등원하지 않은 학생입니다');
     }

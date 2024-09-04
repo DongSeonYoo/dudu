@@ -91,7 +91,22 @@ describe('AttendanceRepository Test', () => {
   });
 
   describe('checkOut', () => {
-    it.todo('해당하는 학생의 출석 정보를 수정한다 (하원)');
+    it('해당하는 학생의 출석 정보를 수정한다 (하원)', async () => {
+      // given
+      const attendanceIdx = studentSeedList[0].idx;
+
+      // when
+      await attendanceRepository.checkOut(attendanceIdx);
+
+      const act = await prisma.attendance.findFirstOrThrow({
+        where: {
+          idx: attendanceIdx,
+        },
+      });
+
+      // then
+      expect(act.checkOutAt).toBeDefined();
+    });
     it('만약 출석 정보가 존재하지 않는다면 prismaClientKnownRequestError가 발생한다', async () => {
       // given
       const attendanceIdx = 9999;

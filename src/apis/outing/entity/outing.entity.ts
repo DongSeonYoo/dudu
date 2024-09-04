@@ -1,3 +1,5 @@
+import { outing } from '@prisma/client';
+
 export class OutingEntity {
   /**
    * 학생 idx
@@ -55,6 +57,13 @@ export class OutingEntity {
     outing.reason = args.reason;
     outing.startedAt = args.startedAt;
     outing.endedAt = args.endedAt;
+
+    return outing;
+  }
+
+  static from(args: outing): OutingEntity {
+    const outing = new OutingEntity();
+    Object.assign(outing, args);
 
     return outing;
   }

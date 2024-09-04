@@ -13,8 +13,8 @@ export class OutingRepository {
   async goOuting(
     input: OutingEntity,
     tx?: Prisma.TransactionClient,
-  ): Promise<void> {
-    await (tx ?? this.prisma).outing.create({
+  ): Promise<OutingEntity> {
+    const outing = await (tx ?? this.prisma).outing.create({
       data: {
         studentIdx: input.studentIdx,
         attendanceIdx: input.attendanceIdx,
@@ -24,6 +24,6 @@ export class OutingRepository {
       },
     });
 
-    return;
+    return OutingEntity.from(outing);
   }
 }

@@ -37,18 +37,19 @@ export class OutingService {
     const findAttendance = await this.attendanceRepository.findTodayAttendance(
       dto.studentIdx,
     );
-    if (!findAttendance || findAttendance.idx !== dto.attendanceIdx) {
+    if (!findAttendance) {
       throw new BadRequestException('등원하지 않은 학생입니다');
     }
 
     if (findAttendance.isOuting) {
       throw new BadRequestException('이미 외출 중인 학생입니다');
     }
+    const outingEntity = dto.toEntity(findAttendance.idx);
 
     await this.transactionManager.runTransaction(async (tx) => {
-      await this.outingRepository.goOuting(dto.toEntity(), tx);
+      await this.outingRepository.goOuting(outingEntity, tx);
 
-      await this.attendanceRepository.changeOutingState(dto.attendanceIdx, tx);
+      await this.attendanceRepository.changeOutingState(findAttendance.idx, tx);
     });
 
     return;

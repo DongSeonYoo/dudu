@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import dayjs from 'dayjs';
+import { DayOfWeek } from '../enum/day-of-week.enum';
 
 @Injectable()
 export class DateUtilService {
@@ -48,5 +49,38 @@ export class DateUtilService {
    */
   addDays(date: Date, days: number): Date {
     return dayjs(date).add(days, 'day').toDate();
+  }
+
+  /**
+   * 주어진 JS 요일을 DayOfWeek 열거형으로 매핑.
+   *
+   * @param jsDay JS 요일 (0부터 6까지)
+   * @returns DayOfWeek 열거형
+   */
+  private mapJSDateToDayOfWeek(jsDay: number): DayOfWeek {
+    const dayMap = [1, 2, 4, 8, 16, 32, 64];
+
+    return dayMap[jsDay];
+  }
+
+  /**
+   * 현재 요일을 DayOfWeek 열거형으로 가져옵니다.
+   *
+   * @returns 현재 요일의 DayOfWeek 열거형
+   */
+  getCurrentDayOfWeek(): DayOfWeek {
+    const today = new Date().getDay();
+
+    return this.mapJSDateToDayOfWeek(today);
+  }
+
+  /**
+   * 주어진 값이 DayOfWeek인지 확인합니다.
+   *
+   * @param value 확인할 값
+   * @returns DayOfWeek인 경우 true, 그렇지 않은 경우 false
+   */
+  isDayOfWeek(value: number): boolean {
+    return Object.values(DayOfWeek).includes(value);
   }
 }

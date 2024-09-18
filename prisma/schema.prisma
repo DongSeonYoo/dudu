@@ -82,14 +82,14 @@ model Student {
 
 model AcademySchedule {
   idx          Int      @id(map: "academy_schedule_pk") @default(autoincrement())
-  student_idx  Int
-  academy_name String   @db.VarChar
+  studentIdx  Int @map("student_idx")
+  academyName String   @db.VarChar @map("academy_name")
   daysOfWeek   Int      @map("days_of_week") @db.SmallInt
   startedAt    DateTime @map("started_at") @db.Timestamptz(6)
   endedAt      DateTime @map("ended_at") @db.Timestamptz(6)
   createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt    DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
-  student      Student  @relation(fields: [student_idx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "academy_schedule_student_idx_fk")
+  student      Student  @relation(fields: [studentIdx], references: [idx], onDelete: NoAction, onUpdate: NoAction, map: "academy_schedule_student_idx_fk")
 
   @@map("academy_schedule")
 }

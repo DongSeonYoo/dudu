@@ -7,7 +7,10 @@ export class AcademyScheduleService {
   constructor(
     private readonly academyScheduleRepository: AcademyScheduleRepository,
   ) {}
+
   async getScheduleByIdx() {}
+
+  async createSchedule() {}
 
   async getScheduleList() {}
 

@@ -9,7 +9,6 @@ import {
   ParseIntPipe,
   Post,
   Put,
-  ValidationPipe,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import {
@@ -55,7 +54,7 @@ export class StudentsController {
   @HttpCode(HttpStatus.OK)
   @ApiSuccess(StudentDetailResponseDto)
   @ApiException(HttpStatus.NOT_FOUND, '학생을 찾을 수 없습니다.')
-  async getStudentDetail(@Param('idx') idx: number) {
+  async getStudentDetail(@Param('idx', ParseIntPipe) idx: number) {
     return await this.studentsService.getStudentDetail(idx);
   }
 

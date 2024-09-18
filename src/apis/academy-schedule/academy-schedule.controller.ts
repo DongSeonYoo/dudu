@@ -6,12 +6,13 @@ import {
   HttpStatus,
   Post,
   Put,
-  Query,
 } from '@nestjs/common';
 import { AcademyScheduleService } from './academy-schedule.service';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CalculateDay } from '../../decorators/today.decorator';
 import { DayOfWeek } from 'src/utils/enum/day-of-week.enum';
+import { ApiExceptions } from 'src/decorators/api-exception.decorator';
+import { StudentNotFoundException } from '../students/exception/student-not-found.exception';
 
 @ApiTags('AcademySchedule')
 @Controller('academy-schedule')
@@ -47,7 +48,8 @@ export class AcademyScheduleController {
    * 학원 스케쥴 등록
    */
   @Post()
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiExceptions(StudentNotFoundException)
   async registerSchedule() {}
 
   /**

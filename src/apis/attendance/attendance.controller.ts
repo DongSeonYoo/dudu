@@ -9,12 +9,16 @@ import {
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { ApiTags } from '@nestjs/swagger';
-import { ApiException } from 'src/decorators/api-exception.decorator';
+import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 import {
   AttendanceListRequestDto,
   AttendanceListResponseDto,
 } from './dto/attendance-list.dto';
 import { ApiSuccess } from 'src/decorators/api-success.decorator';
+import { AlreadyCheckInException } from './exception/already-check-in.exception';
+import { AlreadyCheckOutException } from './exception/already-check-out.exception';
+import { StudentNotFoundException } from '../students/exception/student-not-found.exception';
+import { NotCheckInException } from './exception/not-check-in.exception';
 
 @ApiTags('Attendance')
 @Controller('attendance')
@@ -26,11 +30,10 @@ export class AttendanceController {
    */
   @Post('check-in/:studentIdx')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiException(HttpStatus.NOT_FOUND, '존재하지 않는 학생입니다.')
-  @ApiException(
-    HttpStatus.BAD_REQUEST,
-    '이미 등원한 학생입니다.',
-    '이미 하원한 학생입니다.',
+  @ApiExceptions(
+    StudentNotFoundException,
+    AlreadyCheckInException,
+    AlreadyCheckOutException,
   )
   async checkIn(@Param('studentIdx') studentIdx: number): Promise<void> {
     await this.attendanceService.checkIn(studentIdx);
@@ -43,11 +46,10 @@ export class AttendanceController {
    */
   @Post('check-out/:studentIdx')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiException(HttpStatus.NOT_FOUND, '존재하지 않는 학생입니다.')
-  @ApiException(
-    HttpStatus.BAD_REQUEST,
-    '등원하지 않은 학생입니다.',
-    '이미 하원한 학생입니다.',
+  @ApiExceptions(
+    StudentNotFoundException,
+    NotCheckInException,
+    AlreadyCheckOutException,
   )
   async checkOut(@Param('studentIdx') studentIdx: number) {
     await this.attendanceService.checkOut(studentIdx);

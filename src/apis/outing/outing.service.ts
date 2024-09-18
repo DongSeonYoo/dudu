@@ -1,9 +1,12 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { TransactionManager } from 'src/prisma/prisma-transaction.manager';
 import { OutingRepository } from './outing.repository';
 import { GoOutingRequestDto } from './dto/go-outing.dto';
 import { AttendanceRepository } from '../attendance/attendance.repository';
 import { StudentRepository } from '../students/student.repository';
+import { AlreadyOutingException } from './exception/already-outing.exception';
+import { NotCheckInException } from '../attendance/exception/not-check-in.exception';
+import { StudentNotFoundException } from '../students/exception/student-not-found.exception';
 
 @Injectable()
 export class OutingService {
@@ -30,7 +33,7 @@ export class OutingService {
       dto.studentIdx,
     );
     if (!findStudentResult) {
-      throw new BadRequestException('학생이 존재하지 않습니다');
+      throw new StudentNotFoundException('학생이 존재하지 않습니다');
     }
 
     // 2.
@@ -38,11 +41,11 @@ export class OutingService {
       dto.studentIdx,
     );
     if (!findAttendance) {
-      throw new BadRequestException('등원하지 않은 학생입니다');
+      throw new NotCheckInException('등원하지 않은 학생입니다');
     }
 
     if (findAttendance.isOuting) {
-      throw new BadRequestException('이미 외출 중인 학생입니다');
+      throw new AlreadyOutingException('이미 외출 중인 학생입니다');
     }
     const outingEntity = dto.toEntity(findAttendance.idx);
 

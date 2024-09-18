@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { StudentRepository } from './student.repository';
 import {
   CreateStudentRequestDto,
@@ -16,7 +11,8 @@ import { UpdateStudentRequestDto } from './dto/update-student.dto';
 import { StudentEntity } from './entity/students.entity';
 import { EnrollmentService } from '../enrollment/enrollment.service';
 import { EnrollmentRepository } from '../enrollment/entollment.repository';
-import { EnrollmentEntity } from '../enrollment/entity/enrollment.entity';
+import { StudentNotFoundException } from './exception/student-not-found.exception';
+import { StudentNumberConflictException } from './exception/student-number-conflict.exception';
 
 @Injectable()
 export class StudentsService {
@@ -33,7 +29,7 @@ export class StudentsService {
       await this.studentRepository.findStudentByIdx(studentIdx);
 
     if (!findStudentResult) {
-      throw new NotFoundException('학생을 찾을수 없습니다');
+      throw new StudentNotFoundException();
     }
 
     return findStudentResult;
@@ -50,7 +46,7 @@ export class StudentsService {
         student.studentNumber,
       );
     if (checkDuplicateStudentNumberResult) {
-      throw new ConflictException('이미 존재하는 학번입니다.');
+      throw new StudentNumberConflictException();
     }
 
     // 등록 정보 생성
@@ -106,7 +102,7 @@ export class StudentsService {
         dto.studentNumber,
       );
       if (result && result.idx !== studentIdx) {
-        throw new ConflictException('이미 존재하는 학번입니다.');
+        throw new StudentNumberConflictException();
       }
     }
 
@@ -129,7 +125,7 @@ export class StudentsService {
       await this.studentRepository.findStudentByStudentNumber(studentNumber);
 
     if (!student) {
-      throw new NotFoundException('해당하는 학생이 존재하지 않습니다');
+      throw new StudentNotFoundException('해당하는 학생이 존재하지 않습니다');
     }
 
     return {

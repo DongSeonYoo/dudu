@@ -3,11 +3,12 @@ import {
   BadRequestException,
   PipeTransform,
 } from '@nestjs/common';
+import { NumberStringException } from 'src/exceptions/number-string.exception';
 
 export class ParseNumberStringPipe implements PipeTransform<string, string> {
   transform(value: string, metadata: ArgumentMetadata): string {
     if (isNaN(Number(value))) {
-      throw new BadRequestException('Not convertible string to number');
+      throw new NumberStringException();
     }
 
     return value;

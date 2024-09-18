@@ -16,12 +16,15 @@ import {
   CreateStudentResponseDto,
 } from './dto/create-student.dto';
 import { ApiSuccess } from 'src/decorators/api-success.decorator';
-import { ApiException } from 'src/decorators/api-exception.decorator';
+import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 import { StudentDetailResponseDto } from './dto/student-detail.dto';
 import { UpdateStudentRequestDto } from './dto/update-student.dto';
 import { ApiOperation, ApiProperty, ApiTags, PickType } from '@nestjs/swagger';
 import { ParseNumberStringPipe } from 'src/filters/parse-number-string.pipe';
 import { StudentEntity } from './entity/students.entity';
+import { StudentNotFoundException } from './exception/student-not-found.exception';
+import { NumberStringException } from 'src/exceptions/number-string.exception';
+import { StudentNumberConflictException } from './exception/student-number-conflict.exception';
 
 @ApiTags('Student')
 @Controller('student')
@@ -40,7 +43,7 @@ export class StudentsController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @ApiSuccess(CreateStudentResponseDto)
-  @ApiException(HttpStatus.CONFLICT, '이미 존재하는 학번입니다.')
+  @ApiExceptions(StudentNumberConflictException)
   async createStudent(@Body() createStudentDto: CreateStudentRequestDto) {
     return await this.studentsService.createStudent(createStudentDto);
   }
@@ -53,7 +56,7 @@ export class StudentsController {
   @Get(':idx')
   @HttpCode(HttpStatus.OK)
   @ApiSuccess(StudentDetailResponseDto)
-  @ApiException(HttpStatus.NOT_FOUND, '학생을 찾을 수 없습니다.')
+  @ApiExceptions(StudentNotFoundException)
   async getStudentDetail(@Param('idx', ParseIntPipe) idx: number) {
     return await this.studentsService.getStudentDetail(idx);
   }
@@ -63,8 +66,7 @@ export class StudentsController {
    */
   @Put(':idx')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiException(HttpStatus.NOT_FOUND, '학생을 찾을 수 없습니다.')
-  @ApiException(HttpStatus.CONFLICT, '이미 존재하는 학번입니다.')
+  @ApiExceptions(StudentNotFoundException, StudentNumberConflictException)
   async updateStudent(
     @Param('idx') studentIdx: number,
     @Body() updateStudentDto: UpdateStudentRequestDto,
@@ -79,7 +81,7 @@ export class StudentsController {
    */
   @Delete(':idx')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiException(HttpStatus.NOT_FOUND, '학생을 찾을 수 없습니다.')
+  @ApiExceptions(StudentNotFoundException)
   async deleteStudent(@Param('idx') studentIdx: number) {
     await this.studentsService.deleteStudent(studentIdx);
 
@@ -91,9 +93,8 @@ export class StudentsController {
    */
   @Get('number/:studentNumber')
   @HttpCode(HttpStatus.OK)
-  @ApiException(HttpStatus.NOT_FOUND, '해당하는 학생이 존재하지 않습니다')
-  @ApiException(HttpStatus.BAD_REQUEST, 'Not convertible string to number')
   @ApiSuccess(PickType(StudentEntity, ['name']))
+  @ApiExceptions(StudentNotFoundException, NumberStringException)
   async getStudentByStudentNumber(
     @Param('studentNumber', ParseNumberStringPipe) studentNumber: string,
   ) {

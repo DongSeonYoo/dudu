@@ -10,6 +10,10 @@ import {
   AttendanceListRequestDto,
   AttendanceListResponseDto,
 } from './dto/attendance-list.dto';
+import { StudentNotFoundException } from '../students/exception/student-not-found.exception';
+import { AlreadyCheckOutException } from './exception/already-check-out.exception';
+import { AlreadyCheckInException } from './exception/already-check-in.exception';
+import { NotCheckInException } from './exception/not-check-in.exception';
 
 @Injectable()
 export class AttendanceService {
@@ -29,7 +33,7 @@ export class AttendanceService {
     const findStudentResult =
       await this.studentRepository.findStudentByIdx(studentIdx);
     if (!findStudentResult) {
-      throw new NotFoundException('존재하지 않는 학생입니다.');
+      throw new StudentNotFoundException();
     }
 
     // 2. 등원 유효성 체크
@@ -54,7 +58,7 @@ export class AttendanceService {
     const findStudentResult =
       await this.studentRepository.findStudentByIdx(studentIdx);
     if (!findStudentResult) {
-      throw new NotFoundException('존재하지 않는 학생입니다');
+      throw new StudentNotFoundException();
     }
 
     // 2. 하원 유효성 체크
@@ -77,11 +81,11 @@ export class AttendanceService {
     }
 
     if (attendance.checkOutAt) {
-      throw new BadRequestException('이미 하원한 학생입니다');
+      throw new AlreadyCheckOutException();
     }
 
     if (attendance.checkInAt) {
-      throw new BadRequestException('이미 등원한 학생입니다');
+      throw new AlreadyCheckInException();
     }
 
     return;
@@ -96,11 +100,11 @@ export class AttendanceService {
     attendance: AttendanceEntity | null,
   ): AttendanceEntity {
     if (!attendance) {
-      throw new BadRequestException('등원하지 않은 학생입니다');
+      throw new NotCheckInException();
     }
 
     if (attendance.checkOutAt) {
-      throw new BadRequestException('이미 하원한 학생입니다');
+      throw new AlreadyCheckOutException();
     }
 
     return attendance;

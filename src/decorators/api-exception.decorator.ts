@@ -1,29 +1,32 @@
-import { HttpStatus, applyDecorators } from '@nestjs/common';
-import { ApiResponse } from '@nestjs/swagger';
+import { HttpException, Type, applyDecorators } from '@nestjs/common';
+import { ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
-export const ApiException = (status: HttpStatus, ...description: string[]) => {
+export const ApiExceptions = (...errors: Type<HttpException>[]) => {
   return applyDecorators(
-    ApiResponse({
-      status: status,
-      schema: {
-        properties: {
-          statusCode: {
-            type: 'number',
-            example: status,
-          },
-          message: {
-            type: 'string',
-            example: description,
-          },
-          requestURL: {
-            type: 'string',
-          },
-          timestamp: {
-            type: 'Date',
-            example: new Date(),
+    ...errors.map((error) => {
+      const instance = new error();
+      return ApiResponse({
+        status: instance.getStatus(),
+        schema: {
+          properties: {
+            statusCode: {
+              type: 'number',
+              example: instance.getStatus(),
+            },
+            message: {
+              type: 'string',
+              example: instance.message,
+            },
+            requestURL: {
+              type: 'string',
+            },
+            timestamp: {
+              type: 'Date',
+              example: new Date(),
+            },
           },
         },
-      },
+      });
     }),
   );
 };

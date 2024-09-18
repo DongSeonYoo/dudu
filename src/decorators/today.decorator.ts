@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  createParamDecorator,
-  ExecutionContext,
-} from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { InvalidDayOfWeekException } from 'src/exceptions/invalid-day-of-week.exception';
 import { DateUtilService } from 'src/utils/date-util/date-util.service';
 

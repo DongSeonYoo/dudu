@@ -1,4 +1,5 @@
 import {
+  Body,
   Controller,
   Delete,
   Get,
@@ -13,6 +14,12 @@ import { CalculateDay } from '../../decorators/today.decorator';
 import { DayOfWeek } from 'src/utils/enum/day-of-week.enum';
 import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 import { StudentNotFoundException } from '../students/exception/student-not-found.exception';
+import {
+  ScheduleCreateRequestDto,
+  ScheduleCreateResponseDto,
+} from './dto/create-schedule.dto';
+import { ApiSuccess } from 'src/decorators/api-success.decorator';
+import { InvalidDayOfWeekException } from 'src/exceptions/invalid-day-of-week.exception';
 
 @ApiTags('AcademySchedule')
 @Controller('academy-schedule')
@@ -48,9 +55,12 @@ export class AcademyScheduleController {
    * 학원 스케쥴 등록
    */
   @Post()
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiExceptions(StudentNotFoundException)
-  async registerSchedule() {}
+  @HttpCode(HttpStatus.OK)
+  @ApiSuccess(ScheduleCreateResponseDto)
+  @ApiExceptions(StudentNotFoundException, InvalidDayOfWeekException)
+  async registerSchedule(@Body() input: ScheduleCreateRequestDto) {
+    return await this.academyScheduleService.createSchedule(input);
+  }
 
   /**
    * 학원 스케쥴 수정

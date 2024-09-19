@@ -1,4 +1,12 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  HttpCode,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
+  Post,
+} from '@nestjs/common';
 import { OutingService } from './outing.service';
 import { ApiTags } from '@nestjs/swagger';
 import { GoOutingRequestDto } from './dto/go-outing.dto';
@@ -7,6 +15,8 @@ import { StudentNotFoundException } from '../students/exception/student-not-foun
 import { NotCheckInException } from '../attendance/exception/not-check-in.exception';
 import { AlreadyOutingException } from './exception/already-outing.exception';
 import { StratedAtEndedAtException } from 'src/exceptions/started-ended-at.exception';
+import { ReturnOutingRequestDto } from './dto/return-outing.dto';
+import { NotOutingException } from './exception/not-outing.exception';
 
 @ApiTags('Outing')
 @Controller('outing')
@@ -30,10 +40,15 @@ export class OutingController {
     return;
   }
 
-  // /**
-  //  * 외출 복귀
-  //  */
-  // @Post()
-  // @HttpCode(HttpStatus.NO_CONTENT)
-  // returnFromOuting() {}
+  /**
+   * 외출 복귀
+   */
+  @Post('return')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiExceptions(NotOutingException)
+  async returnFromOuting(
+    @Body() returnOutingRequestDto: ReturnOutingRequestDto,
+  ) {
+    return await this.outingService.returnFromOuting(returnOutingRequestDto);
+  }
 }

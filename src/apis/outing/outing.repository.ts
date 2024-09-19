@@ -26,4 +26,34 @@ export class OutingRepository {
 
     return OutingEntity.from(outing);
   }
+
+  async findOutingByIdx(
+    studentIdx: number,
+    attendanceIdx: number,
+    tx?: Prisma.TransactionClient,
+  ): Promise<OutingEntity | null> {
+    const outingResult = await (tx ?? this.prisma).outing.findUnique({
+      where: {
+        attendanceIdx_studentIdx: {
+          attendanceIdx,
+          studentIdx,
+        },
+      },
+    });
+
+    return outingResult ? OutingEntity.from(outingResult) : null;
+  }
+
+  async returnOuting(outing: OutingEntity, tx?: Prisma.TransactionClient) {
+    await (tx ?? this.prisma).outing.delete({
+      where: {
+        attendanceIdx_studentIdx: {
+          studentIdx: outing.studentIdx,
+          attendanceIdx: outing.attendanceIdx,
+        },
+      },
+    });
+
+    return;
+  }
 }

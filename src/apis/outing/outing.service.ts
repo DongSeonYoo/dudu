@@ -7,6 +7,8 @@ import { StudentRepository } from '../students/student.repository';
 import { AlreadyOutingException } from './exception/already-outing.exception';
 import { NotCheckInException } from '../attendance/exception/not-check-in.exception';
 import { StudentNotFoundException } from '../students/exception/student-not-found.exception';
+import { NotOutingException } from './exception/not-outing.exception';
+import { ReturnOutingRequestDto } from './dto/return-outing.dto';
 
 @Injectable()
 export class OutingService {
@@ -58,5 +60,21 @@ export class OutingService {
     return;
   }
 
-  // async returnFromOuting() {}
+  async returnFromOuting(dto: ReturnOutingRequestDto) {
+    const outingEntity = await this.outingRepository.findOutingByIdx(
+      dto.studentIdx,
+      dto.attendanceIdx,
+    );
+    if (!outingEntity) {
+      throw new NotOutingException();
+    }
+
+    await this.transactionManager.runTransaction(async (tx) => {
+      await this.outingRepository.returnOuting(outingEntity, tx);
+
+      await this.attendanceRepository.changeOutingState(dto.attendanceIdx, tx);
+    });
+
+    return;
+  }
 }

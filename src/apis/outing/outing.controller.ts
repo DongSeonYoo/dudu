@@ -6,6 +6,7 @@ import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 import { StudentNotFoundException } from '../students/exception/student-not-found.exception';
 import { NotCheckInException } from '../attendance/exception/not-check-in.exception';
 import { AlreadyOutingException } from './exception/already-outing.exception';
+import { StratedAtEndedAtException } from 'src/exceptions/started-ended-at.exception';
 
 @ApiTags('Outing')
 @Controller('outing')
@@ -21,6 +22,7 @@ export class OutingController {
     StudentNotFoundException,
     NotCheckInException,
     AlreadyOutingException,
+    StratedAtEndedAtException,
   )
   async goOuting(@Body() goOutingRequestDto: GoOutingRequestDto) {
     await this.outingService.goOuting(goOutingRequestDto);

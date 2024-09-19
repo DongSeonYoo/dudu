@@ -1,5 +1,5 @@
 import { HttpException, Type, applyDecorators } from '@nestjs/common';
-import { ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiResponse } from '@nestjs/swagger';
 
 export const ApiExceptions = (...errors: Type<HttpException>[]) => {
   return applyDecorators(
@@ -19,6 +19,7 @@ export const ApiExceptions = (...errors: Type<HttpException>[]) => {
             },
             requestURL: {
               type: 'string',
+              example: 'API ENDPOINT',
             },
             timestamp: {
               type: 'Date',

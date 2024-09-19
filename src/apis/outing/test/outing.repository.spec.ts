@@ -65,4 +65,61 @@ describe('OutingRepository Test', () => {
       expect(act.endedAt).toStrictEqual(outingEntity.endedAt);
     });
   });
+
+  describe('findOutingByIdx', () => {
+    it('외출 정보를 조회한다', async () => {
+      // given
+      await outingRepository.goOuting(outingEntity);
+
+      // when
+      const spy = jest.spyOn(OutingEntity, 'from');
+      const act = await outingRepository.findOutingByIdx(
+        outingEntity.studentIdx,
+        outingEntity.attendanceIdx,
+      );
+
+      // then
+      expect(act).toBeInstanceOf(OutingEntity);
+      expect(spy).toHaveBeenCalledWith(act);
+    });
+
+    it('외출 정보가 없으면 null을 반환한다', async () => {
+      // given
+      await outingRepository.goOuting(outingEntity);
+      outingEntity.attendanceIdx = 9999;
+
+      // when
+      const spy = jest.spyOn(OutingEntity, 'from');
+      const act = await outingRepository.findOutingByIdx(
+        outingEntity.studentIdx,
+        outingEntity.attendanceIdx,
+      );
+
+      // then
+      expect(act).toBeNull();
+      expect(spy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('returnOuting', () => {
+    it('외출 정보를 삭제한다', async () => {
+      // given
+      await outingRepository.goOuting(outingEntity);
+
+      // when
+      await outingRepository.returnOuting(outingEntity);
+
+      const result = await prismaService.outing.findUnique({
+        where: {
+          attendanceIdx_studentIdx: {
+            attendanceIdx: outingEntity.attendanceIdx,
+            studentIdx: outingEntity.studentIdx,
+          },
+        },
+      });
+
+      // then
+      expect(result).toBeNull();
+    });
+  });
 });

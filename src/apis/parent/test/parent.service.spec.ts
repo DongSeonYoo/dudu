@@ -4,7 +4,7 @@ import { ParentRepository } from '../parent.repository';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { ParentEntity } from '../entity/parent.entity';
 import { UpdateParentRequestDto } from '../dto/parent-update.dto';
-import { NotFoundException } from '@nestjs/common';
+import { ParentNotFoundException } from '../exception/parent-not-found.exception';
 
 describe('ParentService', () => {
   let parentService: ParentService;
@@ -43,7 +43,7 @@ describe('ParentService', () => {
       );
     });
 
-    it('만약, 부모 정보가 존재하지 않는다면 NotFoundException이 발생한다', async () => {
+    it('만약, 부모 정보가 존재하지 않는다면 ParentNotFoundException 발생한다', async () => {
       // given
       const notExistParentIdx = parentIdx + 1;
       parentRepository.findParentByIdx.mockResolvedValue(null);
@@ -53,7 +53,7 @@ describe('ParentService', () => {
         parentService.updateParent(notExistParentIdx, dto);
 
       // then
-      await expect(act).rejects.toThrow(NotFoundException);
+      await expect(act).rejects.toThrow(ParentNotFoundException);
     });
   });
 });

@@ -6,11 +6,13 @@ import { AttendanceRepository } from 'src/apis/attendance/attendance.repository'
 import { StudentRepository } from 'src/apis/students/student.repository';
 import { OutingRepository } from '../outing.repository';
 import { GoOutingRequestDto } from '../dto/go-outing.dto';
-import { BadRequestException } from '@nestjs/common';
 import { StudentEntity } from 'src/apis/students/entity/students.entity';
 import { AttendanceEntity } from 'src/apis/attendance/entity/attendance.entity';
 import { Prisma } from '@prisma/client';
 import { OutingEntity } from '../entity/outing.entity';
+import { StudentNotFoundException } from 'src/apis/students/exception/student-not-found.exception';
+import { NotCheckInException } from 'src/apis/attendance/exception/not-check-in.exception';
+import { AlreadyOutingException } from '../exception/already-outing.exception';
 
 describe('OutingService', () => {
   let outingService: OutingService;
@@ -53,7 +55,7 @@ describe('OutingService', () => {
     let dto = new GoOutingRequestDto();
     let mockTransaction = {} as Prisma.TransactionClient;
 
-    it('유효한 학생이 아닌 경우, BadRequestException이 발생한다', async () => {
+    it('유효한 학생이 아닌 경우, StudentNotFoundException 발생한다', async () => {
       // given
       studentRepository.findStudentByIdx.mockResolvedValue(null);
       dto.studentIdx = 999;
@@ -62,12 +64,10 @@ describe('OutingService', () => {
       const act = async () => await outingService.goOuting(dto);
 
       // then
-      await expect(act).rejects.toThrow(
-        new BadRequestException('학생이 존재하지 않습니다'),
-      );
+      await expect(act).rejects.toThrow(StudentNotFoundException);
     });
 
-    it('등원하지 않은 학생인 경우, BadRequestException이 발생한다', async () => {
+    it('등원하지 않은 학생인 경우, NotCheckInException 발생한다', async () => {
       // given
       studentRepository.findStudentByIdx.mockResolvedValue({} as StudentEntity);
       attendanceRepository.findTodayAttendance.mockResolvedValue(null);
@@ -76,12 +76,10 @@ describe('OutingService', () => {
       const act = async () => await outingService.goOuting(dto);
 
       // then
-      await expect(act).rejects.toThrow(
-        new BadRequestException('등원하지 않은 학생입니다'),
-      );
+      await expect(act).rejects.toThrow(NotCheckInException);
     });
 
-    it('이미 외출중인 학생인 경우, BadRequestException이 발생한다', async () => {
+    it('이미 외출중인 학생인 경우, AlreadyOutingException 발생한다', async () => {
       // given
       studentRepository.findStudentByIdx.mockResolvedValue({} as StudentEntity);
       attendanceRepository.findTodayAttendance.mockResolvedValue({
@@ -92,9 +90,7 @@ describe('OutingService', () => {
       const act = async () => await outingService.goOuting(dto);
 
       // then
-      await expect(act).rejects.toThrow(
-        new BadRequestException('이미 외출 중인 학생입니다'),
-      );
+      await expect(act).rejects.toThrow(AlreadyOutingException);
     });
 
     it('금일 출석 내역이 존재한다면, 해당 출석 인덱스로 외출 엔티티를 생성한다', async () => {

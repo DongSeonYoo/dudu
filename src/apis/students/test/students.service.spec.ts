@@ -4,7 +4,6 @@ import { TransactionManager } from 'src/prisma/prisma-transaction.manager';
 import { ParentRepository } from 'src/apis/parent/parent.repository';
 import { MockProxy, mock } from 'jest-mock-extended';
 import { StudentRepository } from '../student.repository';
-import { ConflictException, NotFoundException } from '@nestjs/common';
 import { StudentEntity } from '../entity/students.entity';
 import {
   CreateStudentRequestDto,
@@ -19,6 +18,8 @@ import { EnrollmentService } from 'src/apis/enrollment/enrollment.service';
 import { EnrollmentRepository } from 'src/apis/enrollment/entollment.repository';
 import { EnrollmentCreateRequestDto } from 'src/apis/enrollment/dto/enrollment.dto';
 import { EnrollmentEntity } from 'src/apis/enrollment/entity/enrollment.entity';
+import { StudentNotFoundException } from '../exception/student-not-found.exception';
+import { StudentNumberConflictException } from '../exception/student-number-conflict.exception';
 
 describe('StudentsService', () => {
   let studentService: StudentsService;
@@ -76,7 +77,7 @@ describe('StudentsService', () => {
       expect(act).toBeInstanceOf(StudentEntity);
     });
 
-    it('학생이 존재하지 않을 경우 NotFoundException이 발생한다', async () => {
+    it('학생이 존재하지 않을 경우 StudentNotFoundException 발생한다', async () => {
       // given
       const studentIdx = 1;
 
@@ -85,7 +86,7 @@ describe('StudentsService', () => {
       const act = studentService.checkExistStudent(studentIdx);
 
       // then
-      await expect(act).rejects.toThrow(NotFoundException);
+      await expect(act).rejects.toThrow(StudentNotFoundException);
     });
   });
 
@@ -114,7 +115,7 @@ describe('StudentsService', () => {
       mockTransaction = {} as Prisma.TransactionClient;
     });
 
-    it('중복된 학생 번호가 존재하면 ConflictException이 발생한다', async () => {
+    it('중복된 학생 번호가 존재하면 StudentNumberConflictException 발생한다', async () => {
       // given
       studentRepository.checkDuplicateStudentNumber.mockResolvedValue(
         {} as StudentEntity,
@@ -124,7 +125,7 @@ describe('StudentsService', () => {
       const act = async () => await studentService.createStudent(dto);
 
       // then
-      await expect(act).rejects.toThrow(ConflictException);
+      await expect(act).rejects.toThrow(StudentNumberConflictException);
     });
 
     it('학생 생성 시 등록 정보를 계산한다', async () => {
@@ -190,9 +191,17 @@ describe('StudentsService', () => {
 
     it('학생 번호가 중복되지 않으면, 학생을 생성하고 생성된 학생 엔티티를 반환한다', async () => {
       // given
+      const mockEnrollmentInfo = {
+        amount: 530000,
+        startedAt: dto.enrollment.startedAt,
+        endedAt: new Date('2024-01-31'),
+      };
       studentRepository.checkDuplicateStudentNumber.mockResolvedValue(null);
       transactionManager.runTransaction.mockImplementation(async (cb) =>
         cb(mockTransaction),
+      );
+      enrollmentService.createEnrollmentInfo.mockReturnValue(
+        mockEnrollmentInfo,
       );
       studentRepository.createStudent.mockResolvedValue({} as StudentEntity);
 
@@ -219,7 +228,7 @@ describe('StudentsService', () => {
       expect(act).toBeInstanceOf(StudentDetailResponseDto);
     });
 
-    it('해당하는 학생이 존재하지 않을 경우 NotFoundException이 발생한다', async () => {
+    it('해당하는 학생이 존재하지 않을 경우 StudentNotFoundException 발생한다', async () => {
       // given
       const studentIdx = 999;
 
@@ -228,7 +237,7 @@ describe('StudentsService', () => {
       const act = async () => await studentService.getStudentDetail(studentIdx);
 
       // then
-      await expect(act).rejects.toThrow(NotFoundException);
+      await expect(act).rejects.toThrow(StudentNotFoundException);
     });
   });
 
@@ -257,7 +266,7 @@ describe('StudentsService', () => {
     });
 
     describe('수정 정보에 studentNumber가 포함되어 있으면 중복 검사를 수행한다', () => {
-      it('중복된 studentNumber가 존재한다면 ConflictException이 발생한다', async () => {
+      it('중복된 studentNumber가 존재한다면 StudentNumberConflictException 발생한다', async () => {
         // given
         dto.studentNumber = '1234';
 
@@ -272,10 +281,10 @@ describe('StudentsService', () => {
           await studentService.updateStudent(studentIdx, dto);
 
         // then
-        await expect(act).rejects.toThrow(ConflictException);
+        await expect(act).rejects.toThrow(StudentNumberConflictException);
       });
 
-      it('중복된 studentNumber가 수정하려는 학생의 것이 아닐 경우 ConflictException이 발생한다', async () => {
+      it('중복된 studentNumber가 수정하려는 학생의 것이 아닐 경우 StudentNumberConflictException 발생한다', async () => {
         // given
         dto.studentNumber = '4321';
         studentRepository.findStudentByIdx.mockResolvedValue(
@@ -290,7 +299,7 @@ describe('StudentsService', () => {
           await studentService.updateStudent(studentIdx, dto);
 
         // then
-        await expect(act).rejects.toThrow(ConflictException);
+        await expect(act).rejects.toThrow(StudentNumberConflictException);
       });
 
       it('중복된 studentNumber가 수정하려는 학생의 것일 경우 정상적으로 수정한다', async () => {
@@ -343,7 +352,7 @@ describe('StudentsService', () => {
       expect(studentRepository.deleteStudent).toHaveBeenCalledWith(studentIdx);
     });
 
-    it('해당하는 학생이 존재하지 않을 경우 NotFoundException이 발생한다', async () => {
+    it('해당하는 학생이 존재하지 않을 경우 StudentNotFoundException 발생한다', async () => {
       // given
       studentRepository.findStudentByIdx.mockResolvedValue(null);
 
@@ -351,7 +360,7 @@ describe('StudentsService', () => {
       const act = async () => await studentService.deleteStudent(studentIdx);
 
       // then
-      await expect(act).rejects.toThrow(NotFoundException);
+      await expect(act).rejects.toThrow(StudentNotFoundException);
     });
   });
 
@@ -374,7 +383,7 @@ describe('StudentsService', () => {
       expect(act).toMatchObject({ name: studentName });
     });
 
-    it('만약 해당하는 학생이 존재하지 않는다면 NotFoundException이 발생한다', async () => {
+    it('만약 해당하는 학생이 존재하지 않는다면 StudentNotFoundException 발생한다', async () => {
       // given
       studentRepository.findStudentByStudentNumber.mockResolvedValue(null);
 
@@ -383,7 +392,7 @@ describe('StudentsService', () => {
         await studentService.getStudentNameByStudentNumber(studentNumber);
 
       // then
-      await expect(act).rejects.toThrow(NotFoundException);
+      await expect(act).rejects.toThrow(StudentNotFoundException);
     });
   });
 });

@@ -125,7 +125,7 @@ export class StudentsService {
       await this.studentRepository.findStudentByStudentNumber(studentNumber);
 
     if (!student) {
-      throw new StudentNotFoundException('해당하는 학생이 존재하지 않습니다');
+      throw new StudentNotFoundException();
     }
 
     return {

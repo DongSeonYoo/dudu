@@ -1,28 +1,25 @@
-import { Prisma, PrismaClient } from '@prisma/client';
+import { Prisma, Student } from '@prisma/client';
 
-export const attendanceSeedList = [
+const attendanceSeedList = [
   {
-    idx: 1,
-    studentIdx: 1,
     checkInAt: new Date(),
   },
   {
-    idx: 2,
-    studentIdx: 2,
     checkInAt: new Date(),
   },
   {
-    idx: 3,
-    studentIdx: 3,
     checkInAt: new Date(),
   },
 ];
-const prisma = new PrismaClient();
 
-export async function seedAttendances(
-  attendance: Prisma.AttendanceCreateManyInput[],
+export async function attendanceSeed(
+  students: Student[],
+  tx: Prisma.TransactionClient,
 ) {
-  await prisma.attendance.createMany({
-    data: attendance,
+  await tx.attendance.createMany({
+    data: students.map((e, i) => ({
+      studentIdx: e.idx,
+      checkInAt: attendanceSeedList[i].checkInAt,
+    })),
   });
 }

@@ -1,8 +1,7 @@
-import { $Enums, Prisma, PrismaClient, Student } from '@prisma/client';
+import { $Enums, Prisma } from '@prisma/client';
 
-export const studentSeedList = [
+const studentSeedList = [
   {
-    idx: 1,
     name: '홍길동',
     studentNumber: '1234',
     birthDate: new Date('2000-01-01'),
@@ -13,7 +12,6 @@ export const studentSeedList = [
     type: $Enums.TYPE.STUDENT,
   },
   {
-    idx: 2,
     name: '홍길동2',
     studentNumber: '2234',
     birthDate: new Date('2000-01-01'),
@@ -24,7 +22,6 @@ export const studentSeedList = [
     type: $Enums.TYPE.STUDENT,
   },
   {
-    idx: 3,
     name: '홍길동3',
     studentNumber: '3234',
     birthDate: new Date('2000-01-01'),
@@ -36,14 +33,10 @@ export const studentSeedList = [
   },
 ];
 
-const prisma = new PrismaClient();
-
-export async function seedStudents(
-  studentList: Prisma.StudentCreateManyInput[],
-): Promise<Student[]> {
-  await prisma.student.createMany({
-    data: studentList,
+export async function studentSeed(tx: Prisma.TransactionClient) {
+  await tx.student.createMany({
+    data: studentSeedList,
   });
 
-  return await prisma.student.findMany().then((res) => res);
+  return tx.student.findMany();
 }

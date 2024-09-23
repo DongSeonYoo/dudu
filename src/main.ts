@@ -8,7 +8,10 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const PORT = app.get(ConfigService).get('PORT');
 
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', {
+    exclude: ['(.*)'],
+  });
+
   app.use(cookieParser());
 
   setSwagger(app);

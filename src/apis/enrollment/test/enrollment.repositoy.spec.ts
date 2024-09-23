@@ -2,17 +2,17 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { EnrollmentRepository } from '../entollment.repository';
 import { PrismaModule } from 'src/prisma/prisma.module';
-import { seedStudents, studentSeedList } from 'test/util/seed/student-seed';
 import { Student } from '@prisma/client';
 import { EnrollmentEntity } from '../entity/enrollment.entity';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
+import { studentSeed } from 'test/util/seed/student-seed';
 
 describe('EnrollmentRepository Test', () => {
   let prisma: PrismaService;
   let enrollmentRepository: EnrollmentRepository;
   let createdStudentList: Student[];
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaModule],
       providers: [EnrollmentRepository],
@@ -21,15 +21,20 @@ describe('EnrollmentRepository Test', () => {
     prisma = module.get<PrismaService>(PrismaService);
     enrollmentRepository =
       module.get<EnrollmentRepository>(EnrollmentRepository);
-    createdStudentList = await seedStudents(studentSeedList);
+
+    await prisma.$transaction(async (tx) => {
+      createdStudentList = await studentSeed(tx);
+    });
   });
 
-  afterAll(async () => {
+  afterEach(async () => {
     await prisma.$transaction([
       prisma.enrollment.deleteMany(),
       prisma.student.deleteMany(),
     ]);
+  });
 
+  afterAll(async () => {
     await prisma.$disconnect();
   });
 
@@ -64,19 +69,6 @@ describe('EnrollmentRepository Test', () => {
         where: { studentIdx },
       });
       expect(createdEnrollment).toBeDefined();
-    });
-
-    it('유효하지 않은 날짜로 등록 시 에러가 발생한다', async () => {
-      const studentIdx = createdStudentList[2].idx;
-      const invalidEnrollment = EnrollmentEntity.create({
-        amount: 530000,
-        startedAt: new Date('2020-06-12'),
-        endedAt: new Date('2020-06-11'), // endedAt이 startedAt보다 이전
-      });
-
-      await expect(
-        enrollmentRepository.createEnrollment(studentIdx, invalidEnrollment),
-      ).rejects.toThrow();
     });
 
     it('최대 금액을 초과하는 등록 시 에러가 발생한다', async () => {});

@@ -3,19 +3,19 @@ import { AttendanceRepository } from '../attendance.repository';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { DateUtilService } from 'src/utils/date-util/date-util.service';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { seedStudents, studentSeedList } from 'test/util/seed/student-seed';
-import {
-  attendanceSeedList,
-  seedAttendances,
-} from 'test/util/seed/attendance-seed';
+import { attendanceSeed } from 'test/util/seed/attendance-seed';
 import { AttendanceEntity } from '../entity/attendance.entity';
-import { Prisma } from '@prisma/client';
+import { Attendance, Prisma, Student } from '@prisma/client';
 import { StudentEntity } from 'src/apis/students/entity/students.entity';
+import { studentSeed } from 'test/util/seed/student-seed';
+import { parentSeed } from 'test/util/seed/parent-seed';
 
 describe('AttendanceRepository Test', () => {
   let attendanceRepository: AttendanceRepository;
   let prisma: PrismaService;
   let dateUtilService: DateUtilService;
+  let findFirstStudent: Student;
+  let findFirstAttendance: Attendance;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -28,13 +28,24 @@ describe('AttendanceRepository Test', () => {
     prisma = module.get<PrismaService>(PrismaService);
     dateUtilService = module.get<DateUtilService>(DateUtilService);
 
-    await seedStudents(studentSeedList);
-    await seedAttendances(attendanceSeedList);
+    await prisma.$transaction(async (tx) => {
+      const students = await studentSeed(tx);
+      await parentSeed(students, tx);
+      await attendanceSeed(students, tx);
+    });
+  });
+
+  beforeEach(async () => {
+    findFirstStudent = await prisma.student.findFirstOrThrow();
+    findFirstAttendance = await prisma.attendance.findFirstOrThrow();
   });
 
   afterEach(async () => {
-    await prisma.attendance.deleteMany();
-    await prisma.student.deleteMany();
+    await prisma.$transaction([
+      prisma.attendance.deleteMany(),
+      prisma.parent.deleteMany(),
+      prisma.student.deleteMany(),
+    ]);
   });
 
   afterAll(async () => {
@@ -44,7 +55,7 @@ describe('AttendanceRepository Test', () => {
   describe('findTodayAttendance', () => {
     it('해당하는 학생의 오늘의 출석 정보를 가져온다', async () => {
       // given
-      const studentIdx = studentSeedList[0].idx;
+      const studentIdx = findFirstStudent.idx;
       const spy = jest.spyOn(AttendanceEntity, 'from');
 
       // when
@@ -72,7 +83,7 @@ describe('AttendanceRepository Test', () => {
   describe('checkIn', () => {
     it('해당하는 학생의 출석 정보를 생성한다', async () => {
       // given
-      const studentIdx = studentSeedList[0].idx;
+      const studentIdx = findFirstStudent.idx;
 
       // when
       await attendanceRepository.checkIn(studentIdx);
@@ -93,7 +104,7 @@ describe('AttendanceRepository Test', () => {
   describe('checkOut', () => {
     it('해당하는 학생의 출석 정보를 수정한다 (하원)', async () => {
       // given
-      const attendanceIdx = studentSeedList[0].idx;
+      const attendanceIdx = findFirstAttendance.idx;
 
       // when
       await attendanceRepository.checkOut(attendanceIdx);
@@ -143,7 +154,7 @@ describe('AttendanceRepository Test', () => {
 
     it('해당하는 날짜의 학생의 출석 정보가 없을 경우, 해당 학생의 attendance는 null을 반환한다', async () => {
       // given
-      const deletedAttendanceIdx = attendanceSeedList[0].idx;
+      const deletedAttendanceIdx = findFirstAttendance.idx;
       await prisma.attendance.delete({
         where: {
           idx: deletedAttendanceIdx,

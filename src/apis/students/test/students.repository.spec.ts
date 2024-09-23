@@ -3,13 +3,16 @@ import { StudentRepository } from '../student.repository';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { StudentEntity } from '../entity/students.entity';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { seedStudents, studentSeedList } from 'test/util/seed/student-seed';
+import { Student } from '@prisma/client';
+import { studentSeed } from 'test/util/seed/student-seed';
+import { parentSeed } from 'test/util/seed/parent-seed';
 
 describe('StudentRepository Test', () => {
   let studentRepository: StudentRepository;
   let prisma: PrismaService;
+  let findFirstStudent: Student;
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [PrismaModule],
       providers: [StudentRepository],
@@ -18,13 +21,25 @@ describe('StudentRepository Test', () => {
     studentRepository = module.get<StudentRepository>(StudentRepository);
     prisma = module.get<PrismaService>(PrismaService);
 
-    await seedStudents(studentSeedList);
+    await prisma.$transaction(async (tx) => {
+      const students = await studentSeed(tx);
+
+      await parentSeed(students, tx);
+    });
+  });
+
+  beforeEach(async () => {
+    findFirstStudent = await prisma.student.findFirstOrThrow({});
+  });
+
+  afterEach(async () => {
+    await prisma.$transaction(async (tx) => {
+      await tx.parent.deleteMany();
+      await tx.student.deleteMany();
+    });
   });
 
   afterAll(async () => {
-    await prisma.parent.deleteMany({});
-    await prisma.student.deleteMany({});
-
     await prisma.$disconnect();
   });
 
@@ -53,10 +68,11 @@ describe('StudentRepository Test', () => {
   describe('findStudentByIdx', () => {
     it('학생의 인덱스를 받아 해당하는 학생의 엔티티를 반환한다.', async () => {
       // given
-      const studentIdx = 1;
 
       // when
-      const act = await studentRepository.findStudentByIdx(studentIdx);
+      const act = await studentRepository.findStudentByIdx(
+        findFirstStudent.idx,
+      );
 
       // then
       expect(act).toBeInstanceOf(StudentEntity);
@@ -103,22 +119,21 @@ describe('StudentRepository Test', () => {
   describe('updateStudent', () => {
     it('주어진 학생 인덱스를 기반으로 변경된 학생 정보를 업데이트한다', async () => {
       // given
-      const studentIdx = 1;
       const updatedData = {
         name: 'name update',
       };
 
       // when
       const act = await studentRepository.updateStudent(
-        studentIdx,
+        findFirstStudent.idx,
         updatedData,
       );
 
       // then
       expect(act).toBeInstanceOf(StudentEntity);
       expect(act.name).toBe(updatedData.name);
-      expect(act.name).not.toBe(studentSeedList[0].name);
-      expect(act.school).toBe(studentSeedList[0].school);
+      expect(act.name).not.toBe(findFirstStudent.name);
+      expect(act.school).toBe(findFirstStudent.school);
     });
   });
 

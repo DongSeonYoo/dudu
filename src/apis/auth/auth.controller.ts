@@ -23,15 +23,23 @@ export class AuthController {
    * 로그인
    */
   @Post('login')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiSuccess(LoginResponseDto)
   @ApiExceptions(LoginFailedException)
-  async login(@Body() input: LoginRequestDto) {
+  async login(
+    @Body() input: LoginRequestDto,
+    @Res({ passthrough: false }) res: Response,
+  ) {
     const adminAccessToken = await this.authService.login(input);
 
     // Set token to redis
     await this.authService.setTokenToRedis(adminAccessToken);
+    res.cookie('accessToken', adminAccessToken, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
+    });
 
-    return adminAccessToken;
+    return res.send();
   }
 }

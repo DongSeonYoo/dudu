@@ -6,6 +6,7 @@ import { RedisService } from 'src/redis/redis.service';
 import { TokenService } from 'src/token/token.service';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthException } from 'src/exceptions/jwt-auth.exception';
+import { Request } from 'express';
 
 @Injectable()
 export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
@@ -16,9 +17,13 @@ export class JwtAccessStrategy extends PassportStrategy(Strategy, 'jwt') {
     private readonly tokenService: TokenService,
   ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromExtractors([
+        (req: Request) => {
+          return req.cookies?.accessToken;
+        },
+      ]),
       ignoreExpiration: false,
-      secretOrKey: configService.get<string>('JWT_SECRET_KEY'),
+      secretOrKey: configService.get('JWT_SECRET_KEY'),
     });
   }
 

@@ -13,7 +13,7 @@ import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 import { ParentNotFoundException } from './exception/parent-not-found.exception';
 
 @ApiTags('Parent')
-@Controller('parent')
+@Controller('/api/parent')
 export class ParentController {
   constructor(private readonly parentService: ParentService) {}
 

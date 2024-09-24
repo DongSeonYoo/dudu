@@ -19,9 +19,11 @@ import { AlreadyCheckInException } from './exception/already-check-in.exception'
 import { AlreadyCheckOutException } from './exception/already-check-out.exception';
 import { StudentNotFoundException } from '../students/exception/student-not-found.exception';
 import { NotCheckInException } from './exception/not-check-in.exception';
+import { LoginAuthGuard } from 'src/decorators/jwt-auth.decorator';
 
 @ApiTags('Attendance')
-@Controller('attendance')
+@Controller('/api/attendance')
+@LoginAuthGuard()
 export class AttendanceController {
   constructor(private readonly attendanceService: AttendanceService) {}
 

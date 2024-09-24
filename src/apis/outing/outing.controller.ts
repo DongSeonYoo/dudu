@@ -19,7 +19,7 @@ import { ReturnOutingRequestDto } from './dto/return-outing.dto';
 import { NotOutingException } from './exception/not-outing.exception';
 
 @ApiTags('Outing')
-@Controller('outing')
+@Controller('/api/outing')
 export class OutingController {
   constructor(private readonly outingService: OutingService) {}
 

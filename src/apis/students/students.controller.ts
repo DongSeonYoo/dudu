@@ -27,7 +27,7 @@ import { NumberStringException } from 'src/exceptions/number-string.exception';
 import { StudentNumberConflictException } from './exception/student-number-conflict.exception';
 
 @ApiTags('Student')
-@Controller('student')
+@Controller('/api/student')
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 

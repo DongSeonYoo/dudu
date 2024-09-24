@@ -22,7 +22,7 @@ import { ApiSuccess } from 'src/decorators/api-success.decorator';
 import { InvalidDayOfWeekException } from 'src/exceptions/invalid-day-of-week.exception';
 
 @ApiTags('AcademySchedule')
-@Controller('academy-schedule')
+@Controller('/api/academy-schedule')
 export class AcademyScheduleController {
   constructor(
     private readonly academyScheduleService: AcademyScheduleService,

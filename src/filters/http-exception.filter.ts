@@ -33,6 +33,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       timestamp: new Date(),
     };
 
+    if (response.statusCode === HttpStatus.UNAUTHORIZED) {
+      return res.redirect('/');
+    }
+
     if (this.configService.get<string>('NODE_ENV') === 'development') {
       this.logger.debug(exception.stack);
     }

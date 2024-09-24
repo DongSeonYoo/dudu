@@ -6,14 +6,12 @@ export const setSwagger = (app: INestApplication) => {
     .setTitle('dudu')
     .setDescription('')
     .setVersion('0.0.1')
-    .addBearerAuth(
+    .addCookieAuth(
+      'accessToken',
       {
         type: 'http',
-        scheme: 'bearer',
-        name: 'JWT',
-        in: 'header',
       },
-      'access-token',
+      'accessToken',
     )
     .build();
 

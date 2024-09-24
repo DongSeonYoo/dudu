@@ -19,6 +19,12 @@ export class RedisService implements OnModuleInit {
   }
 
   async get(key: string): Promise<string | null> {
-    return this.redisClient.get(key);
+    return this.redisClient.get(`session:${key}`);
+  }
+
+  async set(key: string): Promise<void> {
+    this.redisClient.set(`session:admin`, key, 'EX', 60 * 60 * 24);
+
+    return;
   }
 }

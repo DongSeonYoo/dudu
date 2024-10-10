@@ -24,7 +24,7 @@ import { StudentEntity } from './entity/students.entity';
 import { StudentNotFoundException } from './exception/student-not-found.exception';
 import { NumberStringException } from 'src/exceptions/number-string.exception';
 import { StudentNumberConflictException } from './exception/student-number-conflict.exception';
-import { ApiExceptionsTest } from 'src/decorators/api-exception.decorator';
+import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 
 @ApiTags('Student')
 @Controller('/api/student')
@@ -43,7 +43,7 @@ export class StudentsController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @ApiSuccess(CreateStudentResponseDto)
-  @ApiExceptionsTest(HttpStatus.CONFLICT, [
+  @ApiExceptions(HttpStatus.CONFLICT, [
     {
       exampleTitle: '중복된 학생 번호가 존재할 경우',
       schema: StudentNumberConflictException,
@@ -61,7 +61,7 @@ export class StudentsController {
   @Get(':idx')
   @HttpCode(HttpStatus.OK)
   @ApiSuccess(StudentDetailResponseDto)
-  @ApiExceptionsTest(HttpStatus.NOT_FOUND, [
+  @ApiExceptions(HttpStatus.NOT_FOUND, [
     {
       exampleTitle: '학생을 찾지 못했을 경우',
       schema: StudentNotFoundException,
@@ -76,13 +76,13 @@ export class StudentsController {
    */
   @Put(':idx')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiExceptionsTest(HttpStatus.NOT_FOUND, [
+  @ApiExceptions(HttpStatus.NOT_FOUND, [
     {
       exampleTitle: '학생을 찾지 못했을 경우',
       schema: StudentNotFoundException,
     },
   ])
-  @ApiExceptionsTest(HttpStatus.CONFLICT, [
+  @ApiExceptions(HttpStatus.CONFLICT, [
     {
       exampleTitle: '학생 번호가 중복되었을 경우',
       schema: StudentNumberConflictException,
@@ -102,7 +102,7 @@ export class StudentsController {
    */
   @Delete(':idx')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiExceptionsTest(HttpStatus.NOT_FOUND, [
+  @ApiExceptions(HttpStatus.NOT_FOUND, [
     {
       exampleTitle: '학생을 찾지 못했을 경우',
       schema: StudentNotFoundException,
@@ -120,7 +120,7 @@ export class StudentsController {
   @Get('number/:studentNumber')
   @HttpCode(HttpStatus.OK)
   @ApiSuccess(PickType(StudentEntity, ['name']))
-  @ApiExceptionsTest(HttpStatus.NOT_FOUND, [
+  @ApiExceptions(HttpStatus.NOT_FOUND, [
     {
       exampleTitle: '학생을 찾지 못했을 경우',
       schema: StudentNotFoundException,

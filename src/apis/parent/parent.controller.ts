@@ -9,7 +9,7 @@ import {
 import { ParentService } from './parent.service';
 import { ApiTags } from '@nestjs/swagger';
 import { UpdateParentRequestDto } from './dto/parent-update.dto';
-import { ApiExceptionsTest } from 'src/decorators/api-exception.decorator';
+import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 import { ParentNotFoundException } from './exception/parent-not-found.exception';
 
 @ApiTags('Parent')
@@ -24,7 +24,7 @@ export class ParentController {
    */
   @Put(':parentIdx')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiExceptionsTest(HttpStatus.NOT_FOUND, [
+  @ApiExceptions(HttpStatus.NOT_FOUND, [
     {
       exampleTitle: '부모 정보가 존재하지 않을 경우',
       schema: ParentNotFoundException,

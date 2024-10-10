@@ -20,7 +20,7 @@ export interface ErrorResponseOption {
   schema: Type<HttpException>;
 }
 
-export const ApiExceptionsTest = (
+export const ApiExceptions = (
   statusCode: HttpStatus,
   errorResponseOption: ErrorResponseOption[],
 ) => {

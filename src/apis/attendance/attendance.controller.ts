@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { ApiTags } from '@nestjs/swagger';
-import { ApiExceptionsTest } from 'src/decorators/api-exception.decorator';
+import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 import {
   AttendanceListRequestDto,
   AttendanceListResponseDto,
@@ -32,19 +32,19 @@ export class AttendanceController {
    */
   @Post('check-in/:studentIdx')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiExceptionsTest(HttpStatus.NOT_FOUND, [
+  @ApiExceptions(HttpStatus.NOT_FOUND, [
     {
       exampleTitle: '학생을 찾지 못했을 경우',
       schema: StudentNotFoundException,
     },
   ])
-  @ApiExceptionsTest(HttpStatus.BAD_REQUEST, [
+  @ApiExceptions(HttpStatus.BAD_REQUEST, [
     {
       exampleTitle: '이미 등원한 학생인 경우',
       schema: AlreadyCheckInException,
     },
   ])
-  @ApiExceptionsTest(HttpStatus.BAD_REQUEST, [
+  @ApiExceptions(HttpStatus.BAD_REQUEST, [
     {
       exampleTitle: '이미 하원한 학생인 경우',
       schema: AlreadyCheckOutException,
@@ -61,13 +61,13 @@ export class AttendanceController {
    */
   @Post('check-out/:studentIdx')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiExceptionsTest(HttpStatus.NOT_FOUND, [
+  @ApiExceptions(HttpStatus.NOT_FOUND, [
     {
       exampleTitle: '학생을 찾지 못했을 경우',
       schema: StudentNotFoundException,
     },
   ])
-  @ApiExceptionsTest(HttpStatus.NOT_FOUND, [
+  @ApiExceptions(HttpStatus.NOT_FOUND, [
     {
       exampleTitle: '학생이 등원하지 않았을 경우',
       schema: NotCheckInException,

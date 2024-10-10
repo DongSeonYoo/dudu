@@ -9,7 +9,7 @@ import {
 import { AuthService } from './auth.service';
 import { ApiTags } from '@nestjs/swagger';
 import { LoginRequestDto, LoginResponseDto } from './dto/login.dto';
-import { ApiExceptionsTest } from 'src/decorators/api-exception.decorator';
+import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 import { LoginFailedException } from './exceptions/login-failed.exception';
 import { ApiSuccess } from 'src/decorators/api-success.decorator';
 import { Response } from 'express';
@@ -25,7 +25,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiSuccess(LoginResponseDto)
-  @ApiExceptionsTest(HttpStatus.BAD_REQUEST, [
+  @ApiExceptions(HttpStatus.BAD_REQUEST, [
     {
       exampleTitle: '로그인 실패할 경우',
       schema: LoginFailedException,

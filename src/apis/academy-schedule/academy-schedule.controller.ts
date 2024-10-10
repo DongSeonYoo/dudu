@@ -18,7 +18,7 @@ import {
   ScheduleCreateResponseDto,
 } from './dto/create-schedule.dto';
 import { ApiSuccess } from 'src/decorators/api-success.decorator';
-import { ApiExceptionsTest } from 'src/decorators/api-exception.decorator';
+import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 
 @ApiTags('AcademySchedule')
 @Controller('/api/academy-schedule')
@@ -56,7 +56,7 @@ export class AcademyScheduleController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @ApiSuccess(ScheduleCreateResponseDto)
-  @ApiExceptionsTest(HttpStatus.NOT_FOUND, [
+  @ApiExceptions(HttpStatus.NOT_FOUND, [
     {
       exampleTitle: '학생이 존재하지 않을 경우',
       schema: StudentNotFoundException,

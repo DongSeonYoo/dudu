@@ -2,7 +2,7 @@ import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { OutingService } from './outing.service';
 import { ApiTags } from '@nestjs/swagger';
 import { GoOutingRequestDto } from './dto/go-outing.dto';
-import { ApiExceptionsTest } from 'src/decorators/api-exception.decorator';
+import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 import { NotCheckInException } from '../attendance/exception/not-check-in.exception';
 import { AlreadyOutingException } from './exception/already-outing.exception';
 import { ReturnOutingRequestDto } from './dto/return-outing.dto';
@@ -18,7 +18,7 @@ export class OutingController {
    */
   @Post()
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiExceptionsTest(HttpStatus.BAD_REQUEST, [
+  @ApiExceptions(HttpStatus.BAD_REQUEST, [
     {
       exampleTitle: '이미 외출 중인 학생인 경우',
       schema: AlreadyOutingException,
@@ -43,7 +43,7 @@ export class OutingController {
    */
   @Post('return')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiExceptionsTest(HttpStatus.NOT_FOUND, [
+  @ApiExceptions(HttpStatus.NOT_FOUND, [
     {
       exampleTitle: '외출 중인 학생이 아닐 경우',
       schema: NotOutingException,

@@ -25,7 +25,12 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiSuccess(LoginResponseDto)
-  @ApiExceptions(LoginFailedException)
+  @ApiExceptions(HttpStatus.BAD_REQUEST, [
+    {
+      exampleTitle: '로그인 실패할 경우',
+      schema: LoginFailedException,
+    },
+  ])
   async login(
     @Body() input: LoginRequestDto,
     @Res({ passthrough: false }) res: Response,

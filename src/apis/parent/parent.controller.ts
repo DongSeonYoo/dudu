@@ -24,7 +24,12 @@ export class ParentController {
    */
   @Put(':parentIdx')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiExceptions(ParentNotFoundException)
+  @ApiExceptions(HttpStatus.NOT_FOUND, [
+    {
+      exampleTitle: '부모 정보가 존재하지 않을 경우',
+      schema: ParentNotFoundException,
+    },
+  ])
   async updateParent(
     @Param('parentIdx') parentIdx: number,
     @Body() updateParent: UpdateParentRequestDto,

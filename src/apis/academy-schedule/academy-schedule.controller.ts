@@ -12,14 +12,13 @@ import { AcademyScheduleService } from './academy-schedule.service';
 import { ApiQuery, ApiTags } from '@nestjs/swagger';
 import { CalculateDay } from '../../decorators/today.decorator';
 import { DayOfWeek } from 'src/utils/enum/day-of-week.enum';
-import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 import { StudentNotFoundException } from '../students/exception/student-not-found.exception';
 import {
   ScheduleCreateRequestDto,
   ScheduleCreateResponseDto,
 } from './dto/create-schedule.dto';
 import { ApiSuccess } from 'src/decorators/api-success.decorator';
-import { InvalidDayOfWeekException } from 'src/exceptions/invalid-day-of-week.exception';
+import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 
 @ApiTags('AcademySchedule')
 @Controller('/api/academy-schedule')
@@ -57,7 +56,12 @@ export class AcademyScheduleController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @ApiSuccess(ScheduleCreateResponseDto)
-  @ApiExceptions(StudentNotFoundException, InvalidDayOfWeekException)
+  @ApiExceptions(HttpStatus.NOT_FOUND, [
+    {
+      exampleTitle: '학생이 존재하지 않을 경우',
+      schema: StudentNotFoundException,
+    },
+  ])
   async registerSchedule(@Body() input: ScheduleCreateRequestDto) {
     return await this.academyScheduleService.createSchedule(input);
   }

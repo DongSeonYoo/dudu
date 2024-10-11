@@ -56,12 +56,10 @@ export class AcademyScheduleController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @ApiSuccess(ScheduleCreateResponseDto)
-  @ApiExceptions(HttpStatus.NOT_FOUND, [
-    {
-      exampleTitle: '학생이 존재하지 않을 경우',
-      schema: StudentNotFoundException,
-    },
-  ])
+  @ApiExceptions({
+    exampleTitle: '학생이 존재하지 않을 경우',
+    schema: StudentNotFoundException,
+  })
   async registerSchedule(@Body() input: ScheduleCreateRequestDto) {
     return await this.academyScheduleService.createSchedule(input);
   }

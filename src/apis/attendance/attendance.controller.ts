@@ -9,7 +9,6 @@ import {
 } from '@nestjs/common';
 import { AttendanceService } from './attendance.service';
 import { ApiTags } from '@nestjs/swagger';
-import { ApiExceptions } from 'src/decorators/api-exception.decorator';
 import {
   AttendanceListRequestDto,
   AttendanceListResponseDto,
@@ -20,6 +19,8 @@ import { AlreadyCheckOutException } from './exception/already-check-out.exceptio
 import { StudentNotFoundException } from '../students/exception/student-not-found.exception';
 import { NotCheckInException } from './exception/not-check-in.exception';
 import { LoginAuthGuard } from 'src/decorators/jwt-auth.decorator';
+import { ApiExceptions } from 'src/decorators/api-exception.decorator';
+import { AlreadyOutingException } from '../outing/exception/already-outing.exception';
 
 @ApiTags('Attendance')
 @Controller('/api/attendance')
@@ -32,24 +33,20 @@ export class AttendanceController {
    */
   @Post('check-in/:studentIdx')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiExceptions(HttpStatus.NOT_FOUND, [
+  @ApiExceptions(
     {
       exampleTitle: '학생을 찾지 못했을 경우',
       schema: StudentNotFoundException,
     },
-  ])
-  @ApiExceptions(HttpStatus.BAD_REQUEST, [
     {
       exampleTitle: '이미 등원한 학생인 경우',
       schema: AlreadyCheckInException,
     },
-  ])
-  @ApiExceptions(HttpStatus.BAD_REQUEST, [
     {
       exampleTitle: '이미 하원한 학생인 경우',
       schema: AlreadyCheckOutException,
     },
-  ])
+  )
   async checkIn(@Param('studentIdx') studentIdx: number): Promise<void> {
     await this.attendanceService.checkIn(studentIdx);
 
@@ -61,13 +58,11 @@ export class AttendanceController {
    */
   @Post('check-out/:studentIdx')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiExceptions(HttpStatus.NOT_FOUND, [
+  @ApiExceptions(
     {
       exampleTitle: '학생을 찾지 못했을 경우',
       schema: StudentNotFoundException,
     },
-  ])
-  @ApiExceptions(HttpStatus.NOT_FOUND, [
     {
       exampleTitle: '학생이 등원하지 않았을 경우',
       schema: NotCheckInException,
@@ -76,7 +71,11 @@ export class AttendanceController {
       exampleTitle: '학생이 이미 등원하였을 경우',
       schema: AlreadyCheckOutException,
     },
-  ])
+    {
+      exampleTitle: '학생이 이미 외출한 상태일 경우',
+      schema: AlreadyOutingException,
+    },
+  )
   async checkOut(@Param('studentIdx') studentIdx: number) {
     await this.attendanceService.checkOut(studentIdx);
 

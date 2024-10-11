@@ -20,49 +20,52 @@ export interface ErrorResponseOption {
   schema: Type<HttpException>;
 }
 
-export const ApiExceptions = (
-  statusCode: HttpStatus,
-  errorResponseOption: ErrorResponseOption[],
-) => {
-  const examples = errorResponseOption
-    .map((err: ErrorResponseOption): ExamplesObject => {
-      const errorInstance = new err.schema();
-      const errorResponse: IExceptionResponse = {
-        message: errorInstance.message,
-        requestURL: 'requestURL',
-        statusCode: statusCode,
-        timestamp: new Date(),
-      };
+export const ApiExceptions = (...errorResponses: ErrorResponseOption[]) => {
+  const examplesMap = new Map<number, ExamplesObject>();
 
-      return {
+  errorResponses.forEach((err: ErrorResponseOption) => {
+    const errorInstance = new err.schema();
+    const statusCode = errorInstance.getStatus();
+    const errorResponse: IExceptionResponse = {
+      message: errorInstance.message,
+      requestURL: 'requestURL',
+      statusCode: statusCode,
+      timestamp: new Date(),
+    };
+
+    if (!examplesMap.has(statusCode)) {
+      examplesMap.set(statusCode, {});
+    }
+
+    const currentExamples = examplesMap.get(statusCode);
+    if (currentExamples) {
+      examplesMap.set(statusCode, {
+        ...currentExamples,
         [err.exampleTitle]: {
-          value: {
-            ...errorResponse,
-          },
+          value: errorResponse,
         },
-      };
-    })
-    .reduce((result, item) => {
-      Object.assign(result, item);
-      return result;
-    });
+      });
+    }
+  });
 
   return applyDecorators(
     ApiExtraModels(HttpException),
-    ApiResponse({
-      status: statusCode,
-      content: {
-        'application/json': {
-          schema: {
-            oneOf: [
-              {
-                $ref: getSchemaPath(HttpException),
-              },
-            ],
+    ...Array.from(examplesMap.entries()).map(([statusCode, examples]) =>
+      ApiResponse({
+        status: statusCode,
+        content: {
+          'application/json': {
+            schema: {
+              oneOf: [
+                {
+                  $ref: getSchemaPath(HttpException),
+                },
+              ],
+            },
+            examples: examples,
           },
-          examples: examples,
         },
-      },
-    }),
+      }),
+    ),
   );
 };

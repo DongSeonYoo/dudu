@@ -7,6 +7,7 @@ import { NotCheckInException } from '../attendance/exception/not-check-in.except
 import { AlreadyOutingException } from './exception/already-outing.exception';
 import { ReturnOutingRequestDto } from './dto/return-outing.dto';
 import { NotOutingException } from './exception/not-outing.exception';
+import { AlreadyCheckOutException } from '../attendance/exception/already-check-out.exception';
 
 @ApiTags('Outing')
 @Controller('/api/outing')
@@ -18,7 +19,7 @@ export class OutingController {
    */
   @Post()
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiExceptions(HttpStatus.BAD_REQUEST, [
+  @ApiExceptions(
     {
       exampleTitle: '이미 외출 중인 학생인 경우',
       schema: AlreadyOutingException,
@@ -28,10 +29,10 @@ export class OutingController {
       schema: NotCheckInException,
     },
     {
-      exampleTitle: '이미 외출 중인 학생인 경우',
-      schema: AlreadyOutingException,
+      exampleTitle: '이미 하원 한 학생인 경우',
+      schema: AlreadyCheckOutException,
     },
-  ])
+  )
   async goOuting(@Body() goOutingRequestDto: GoOutingRequestDto) {
     await this.outingService.goOuting(goOutingRequestDto);
 
@@ -43,12 +44,10 @@ export class OutingController {
    */
   @Post('return')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiExceptions(HttpStatus.NOT_FOUND, [
-    {
-      exampleTitle: '외출 중인 학생이 아닐 경우',
-      schema: NotOutingException,
-    },
-  ])
+  @ApiExceptions({
+    exampleTitle: '외출 중인 학생이 아닐 경우',
+    schema: NotOutingException,
+  })
   async returnFromOuting(
     @Body() returnOutingRequestDto: ReturnOutingRequestDto,
   ) {
